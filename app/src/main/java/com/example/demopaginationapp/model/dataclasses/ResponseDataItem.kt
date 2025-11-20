@@ -5,7 +5,7 @@ data class ResponseDataItem(
     val id: Int,
     val owner: Owner,
 
-  /*  val allow_forking: Boolean,
+    val allow_forking: Boolean,
     val archive_url: String,
     val archived: Boolean,
     val assignees_url: String,
@@ -82,5 +82,5 @@ data class ResponseDataItem(
     val visibility: String,
     val watchers: Int,
     val watchers_count: Int,
-    val web_commit_signoff_required: Boolean*/
+    val web_commit_signoff_required: Boolean
 )

@@ -90,4 +90,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+    //nav graph
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+
+    //The Hilt-Compose integration library - to get hilt view model
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }

@@ -1,18 +1,26 @@
 package com.example.demopaginationapp.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.example.demopaginationapp.di.GoogleApi
+import com.example.demopaginationapp.di.GoogleBaseUrl
+import com.example.demopaginationapp.model.networking.Resource
 import com.example.demopaginationapp.model.repositories.AppRepository
 import com.example.demopaginationapp.model.repositories.MyPagingSource
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 
 @HiltViewModel
-class BaseViewModel @Inject constructor(private val appRepository: AppRepository) : ViewModel() {
+class BaseViewModel @Inject constructor(@GoogleApi private val appRepository: AppRepository) : ViewModel() {
     //here we setup the paging logic inside the viewmodel that interacts with the repo
     val pager = Pager(PagingConfig(pageSize = 10)) {
         //Pager - manages all the working of paging library
@@ -24,5 +32,6 @@ class BaseViewModel @Inject constructor(private val appRepository: AppRepository
 
     val pagingDataFlow = pager.flow
         .cachedIn(viewModelScope)  //scope of cached memory is tied to viewmodel's scope
+
 
 }

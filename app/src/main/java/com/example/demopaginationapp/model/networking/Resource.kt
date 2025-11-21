@@ -17,7 +17,7 @@ data class Resource<out T>(val status: Status, val data: T?, val message: String
             return Resource(Status.ERROR, data, msg)
         }
 
-        fun <T> loading(data: T?, showLoader : Boolean = true, activity : Activity): Resource<T> {
+        fun <T> loading(data: T?, showLoader : Boolean = true): Resource<T> {
             CoroutineScope(Dispatchers.Main).launch{
                 if (showLoader) {
 //                    Progress.show(activity)

@@ -3,6 +3,7 @@ package com.example.demopaginationapp.model.repositories
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.demopaginationapp.di.GoogleBaseUrl
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
 import javax.inject.Inject
 import kotlin.math.max
@@ -16,7 +17,7 @@ private const val LOAD_DELAY_MILLIS = 3_000L  //delay after each page increment
 
 //tells how to fetch the data - whether from API or database
 //MyPagingSource acts as an intermediate between ui and repo
-class MyPagingSource @Inject constructor(private val appRepository: AppRepository) : PagingSource<Int, ResponseDataItem>() {
+class MyPagingSource @Inject constructor(@GoogleBaseUrl private val appRepository: AppRepository) : PagingSource<Int, ResponseDataItem>() {
     override fun getRefreshKey(state: PagingState<Int, ResponseDataItem>): Int? {
         // In our case we grab the item closest to the anchor position
         // then return its id - (state.config.pageSize / 2) as a buffer

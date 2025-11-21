@@ -1,6 +1,7 @@
 package com.example.demopaginationapp.di
 
 import com.example.demopaginationapp.common.Constants.BASE_URL
+import com.example.demopaginationapp.common.Constants.PRODUCTS_BASE_URL
 import com.example.demopaginationapp.model.networking.ResponseHandler
 import com.example.demopaginationapp.model.networking.RetrofitInterface
 import com.example.demopaginationapp.model.repositories.AppRepository
@@ -23,10 +24,23 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Singleton
+
+
+  /*  @Singleton
     @Provides
     fun provideBaseUrl(): String {
         return BASE_URL
+    }*/
+  @GoogleBaseUrl
+  @Provides
+  fun provideGoogleBaseUrl(): String {
+      return BASE_URL
+  }
+
+    @ProductBaseUrl
+    @Provides
+    fun provideProductBaseUrl(): String {
+        return PRODUCTS_BASE_URL
     }
 
     @Singleton
@@ -95,12 +109,79 @@ object NetworkModule {
     fun provideApiService(retrofit: Retrofit): RetrofitInterface {
         return retrofit.create(RetrofitInterface::class.java)
     }
+    @GoogleApi // Qualifies the returned RetrofitInterface instance as the Google API
+    @Singleton
+    @Provides
+    fun provideGoogleApiService(
+        @GoogleBaseUrl baseUrl: String, // Inject the qualified Google URL
+        converterFactory: Converter.Factory,
+        okHttpClient: OkHttpClient
+    ): RetrofitInterface {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(converterFactory)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+        return retrofit.create(RetrofitInterface::class.java)
+    }
+
+    @ProductApi // Qualifies the returned RetrofitInterface instance as the Product API
+    @Singleton
+    @Provides
+    fun provideProductApiService(
+        @ProductBaseUrl baseUrl: String, // Inject the qualified Product URL
+        converterFactory: Converter.Factory,
+        okHttpClient: OkHttpClient
+    ): RetrofitInterface {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(converterFactory)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+        return retrofit.create(RetrofitInterface::class.java)
+    }
+
+    /**
+     * QUALIFIED REPOSITORY PROVIDERS
+     * Qualifier on the return type is CRITICAL to distinguish between the two AppRepository instances.
+     */
 
     @Singleton
     @Provides
-    fun provideRepository(apiService: RetrofitInterface, responseHandler: ResponseHandler): AppRepository {
+    @GoogleApi // CRITICAL: Qualifies the returned AppRepository instance
+    fun provideGoogleRepository(
+        @GoogleApi apiService: RetrofitInterface, // Inject the qualified Google API service
+        responseHandler: ResponseHandler
+    ): AppRepository {
         return AppRepository(apiService, responseHandler)
     }
+
+    @Singleton
+    @Provides
+    @ProductApi // CRITICAL: Qualifies the returned AppRepository instance
+    fun provideProductRepository(
+        @ProductApi apiService: RetrofitInterface, // Inject the qualified Product API service
+        responseHandler: ResponseHandler
+    ): AppRepository {
+        return AppRepository(apiService, responseHandler)
+    }
+/*
+    @Singleton
+    @Provides
+    @GoogleBaseUrl
+    fun provideRepository( apiService: RetrofitInterface, responseHandler: ResponseHandler): AppRepository {
+        return AppRepository(apiService, responseHandler)
+    }
+
+    @Singleton
+    @Provides
+    @ProductBaseUrl
+    fun provideProductRepository( apiService: RetrofitInterface, responseHandler: ResponseHandler): AppRepository {
+        return AppRepository(apiService, responseHandler)
+    }
+*/
 
 
 }

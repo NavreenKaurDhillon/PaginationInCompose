@@ -1,12 +1,15 @@
 package com.example.demopaginationapp.view.screens
 
+import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,21 +20,26 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -39,132 +47,74 @@ import androidx.paging.compose.items
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
+import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
 import com.example.demopaginationapp.viewmodel.BaseViewModel
 import com.google.gson.Gson
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
+
+val BOLD_STYLE = TextStyle(
+    fontWeight = FontWeight.Bold,
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 16.sp
+
+)
+val SMALL_BOLD_STYLE = TextStyle(
+    fontWeight = FontWeight.Bold,
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 12.sp
+
+)
+val NORMAL_STYLE = TextStyle(
+    fontWeight = FontWeight.Normal,
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 16.sp
+)
+val SMALL_NORMAL_STYLE = TextStyle(
+    fontWeight = FontWeight.Normal,
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 12.sp
+)
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
-   val viewModel: BaseViewModel = hiltViewModel()
-        val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems() //add observer that causes recomposition when there is an update in paging items
-        //collectAsLazyPagingItems() is used to bind the UI to the paging so it automatically sets data when we get new page response
-        //also trigger the paging library to implement the logic when user has scrolled down
+    val viewModel: BaseViewModel = hiltViewModel()
 
-    Scaffold(  containerColor = Color.White){ innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)){
+    val lazyPagingItems =
+        viewModel.pagingDataFlow.collectAsLazyPagingItems() //add observer that causes recomposition when there is an update in paging items
+    //collectAsLazyPagingItems() is used to bind the UI to the paging so it automatically sets data when we get new page response
+    //also trigger the paging library to implement the logic when user has scrolled down
+
+    Scaffold(containerColor = Color.White) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
 
             Text(
-                text = "Google Repos List", style = TextStyle(
-                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif,
-                    fontSize = 18.sp
-                ),
+                text = "Google Repos List", style = BOLD_STYLE,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 8.dp)
             )
 
             LazyColumn(
-                modifier = Modifier
-                    .padding(top = 12.dp,  start = 15.dp, end = 15.dp)
-                    .fillMaxWidth()
+                contentPadding = PaddingValues(15.dp),
+                modifier = Modifier.weight(0.9f)
             ) {
                 items(lazyPagingItems) { responseDataItem ->
                     // items() is a extension function that converts paging data into set of objects that can be used to display data to UI
                     if (responseDataItem != null) {
                         // This is the individual item Composable
-                        ElevatedCard(
-                            modifier = Modifier
-                                .padding(vertical = 10.dp, horizontal = 5.dp)
-                                .fillMaxWidth()
-                            , onClick = {
-                                //send single parameter
-//                                navController.navigate("detail_screen/${responseDataItem.name}")
-
-
-                                //send response object
-                                val jsonString = Gson().toJson(responseDataItem)
-                                val encodedJson = URLEncoder.encode(jsonString, StandardCharsets.UTF_8.name())
-                                navController.navigate("detail_screen/$encodedJson")
-                            },
-                            colors = CardDefaults.elevatedCardColors(
-                                containerColor = Color.White
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(vertical = 12.dp, horizontal = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                GlideImage(
-                                    model = responseDataItem.owner.avatar_url,
-                                    contentDescription = "Logo description of the repo",
-                                    modifier = Modifier
-                                        .width(45.dp)
-                                        .height(45.dp),
-
-                                    )
-
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Row {
-                                        Text(
-                                            text = "ID: ",
-                                            modifier = Modifier.padding(start = 8.dp),
-                                            color = Color.Black // Assuming a dark text color,
-                                            , style = TextStyle(
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = FontFamily.SansSerif,
-                                                fontSize = 16.sp
-                                            )
-                                        )
-                                        Text(
-                                            text = responseDataItem.id.toString(),
-                                            modifier = Modifier.padding(start = 5.dp),
-                                            color = Color.Black // Assuming a dark text color,
-                                            , style = TextStyle(
-                                                fontWeight = FontWeight.Normal,
-                                                fontFamily = FontFamily.SansSerif,
-                                                fontSize = 16.sp
-                                            )
-                                        )
-                                    }
-                                    Row(modifier = Modifier.padding(top = 5.dp)) {
-                                        Text(
-                                            text = "Name: ",
-                                            modifier = Modifier.padding(start = 8.dp),
-                                            color = Color.Black // Assuming a dark text color,
-                                            , style = TextStyle(
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = FontFamily.SansSerif,
-                                                fontSize = 16.sp
-                                            )
-                                        )
-                                        Text(
-                                            text = responseDataItem.name,
-                                            modifier = Modifier.padding(start = 5.dp),
-                                            color = Color.Black // Assuming a dark text color,
-                                            , style = TextStyle(
-                                                fontWeight = FontWeight.Normal,
-                                                fontFamily = FontFamily.SansSerif,
-                                                fontSize = 16.sp
-                                            )
-                                        )
-                                    }
-                                }
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.baseline_keyboard_arrow_right_24),
-                                    modifier = Modifier.size(30.dp),
-                                  contentDescription = "next icon"
-                                )
-
-                            }
-
-                        }
+                        ListItemCard(
+                            responseDataItem = responseDataItem,
+                            navController = navController,
+                            onItemClick = { route -> navController.navigate(route) },
+                        )
 
                     } else {
                         // Placeholder for items that haven't loaded yet (if placeholders are enabled)
-                        Text(text = "Loading Item...", color = Color.Gray)
+//                        Text(text = "Loading Item...", color = Color.Gray)
                     }
                 }
                 lazyPagingItems.apply {
@@ -216,4 +166,120 @@ fun ListScreen(navController: NavHostController) {
     }
 
 
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+private fun ListItemCard(
+    responseDataItem: ResponseDataItem,
+    navController: NavController,
+    onItemClick: (String) -> Unit
+) {
+
+    val uriHandler = LocalUriHandler.current
+    val url = responseDataItem.owner.organizations_url
+
+    ElevatedCard(
+        modifier = Modifier
+            .padding(vertical = 10.dp, horizontal = 5.dp)
+            .fillMaxWidth(), onClick = {
+            //send single parameter
+//        navController.navigate("detail_screen/${responseDataItem.name}")
+
+
+            //send response object
+            val jsonString = Gson().toJson(responseDataItem)
+            val encodedJson = URLEncoder.encode(jsonString, StandardCharsets.UTF_8.name())
+            navController.navigate("detail_screen/$encodedJson")
+        },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideImage(
+                model = responseDataItem.owner.avatar_url,
+                contentDescription = "Logo description of the repo",
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp),
+
+                )
+
+            Column(modifier = Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                    Text(
+                        color = Color.Black,
+                        text = buildAnnotatedString {
+                            withStyle(style = BOLD_STYLE.toSpanStyle()) {
+                                append("ID: ")
+                            }
+                            withStyle(style = NORMAL_STYLE.toSpanStyle()) {
+                                append(responseDataItem.id.toString())
+                            }
+                        }
+                    )
+                Text(
+                    color = Color.Black,
+                    text = buildAnnotatedString {
+                        withStyle(style = BOLD_STYLE.toSpanStyle()){
+                            append("Name: ")
+                        }
+                        withStyle(style = NORMAL_STYLE.toSpanStyle()){
+                            append(responseDataItem.name)
+                        }
+                    })
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp)) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_remove_red_eye_24),
+                        modifier = Modifier.size(18.dp),
+                        contentDescription = "people rating"
+                    )
+                    Text(
+                        text = responseDataItem.watchers.toString(),
+                        modifier = Modifier.padding(
+                            top = 2.dp,
+                            bottom = 2.dp,
+                            start = 5.dp
+                        ),
+                        style = SMALL_NORMAL_STYLE
+                    )
+
+                    Spacer(modifier = Modifier.width(15.dp))
+                    Image(
+                        painter = painterResource(R.drawable.baseline_people_24),
+                        modifier = Modifier.size(18.dp),
+                        contentDescription = "people rating"
+                    )
+                    Text(
+                        text = responseDataItem.forks_count.toString(),
+                        modifier = Modifier.padding(
+                            top = 2.dp,
+                            bottom = 2.dp,
+                            start = 5.dp
+                        ),
+                        style = SMALL_NORMAL_STYLE
+                    )
+                }
+                Text(text = buildAnnotatedString {
+                    withStyle(style = SMALL_BOLD_STYLE.toSpanStyle()){
+                        append("Visibility: ")
+                    }
+                    withStyle(style = SMALL_NORMAL_STYLE.toSpanStyle()){
+                        append(responseDataItem.visibility)
+                    }
+                })
+            }
+            Image(
+                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_right_24),
+                modifier = Modifier.size(30.dp),
+                contentDescription = "next icon"
+            )
+
+        }
+
     }
+}

@@ -16,13 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,59 +57,34 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
+import com.example.demopaginationapp.utils.BOLD_STYLE
+import com.example.demopaginationapp.utils.NORMAL_STYLE
+import com.example.demopaginationapp.utils.SMALL_BOLD_STYLE
+import com.example.demopaginationapp.utils.SMALL_NORMAL_STYLE
 import com.example.demopaginationapp.viewmodel.BaseViewModel
 import com.google.gson.Gson
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 
-val BOLD_STYLE = TextStyle(
-    fontWeight = FontWeight.Bold,
-    fontFamily = FontFamily.SansSerif,
-    fontSize = 16.sp
 
-)
-val SMALL_BOLD_STYLE = TextStyle(
-    fontWeight = FontWeight.Bold,
-    fontFamily = FontFamily.SansSerif,
-    fontSize = 12.sp
-
-)
-val NORMAL_STYLE = TextStyle(
-    fontWeight = FontWeight.Normal,
-    fontFamily = FontFamily.SansSerif,
-    fontSize = 16.sp
-)
-val SMALL_NORMAL_STYLE = TextStyle(
-    fontWeight = FontWeight.Normal,
-    fontFamily = FontFamily.SansSerif,
-    fontSize = 12.sp
-)
-
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
     val viewModel: BaseViewModel = hiltViewModel()
 
-    val lazyPagingItems =
-        viewModel.pagingDataFlow.collectAsLazyPagingItems() //add observer that causes recomposition when there is an update in paging items
+    val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems() //add observer that causes recomposition when there is an update in paging items
     //collectAsLazyPagingItems() is used to bind the UI to the paging so it automatically sets data when we get new page response
     //also trigger the paging library to implement the logic when user has scrolled down
 
-    Scaffold(containerColor = Color.White) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-
-            Text(
-                text = "Google Repos List", style = BOLD_STYLE,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            )
+    Scaffold(containerColor = Color.White,
+        topBar = {
+            com.example.demopaginationapp.utils.TopAppBar("Google Repos List", true, navController)}
+         ) { innerPadding ->
 
             LazyColumn(
-                contentPadding = PaddingValues(15.dp),
-                modifier = Modifier.weight(0.9f)
+                modifier = Modifier.padding(innerPadding),
+                contentPadding = PaddingValues(12.dp),
             ) {
                 items(lazyPagingItems) { responseDataItem ->
                     // items() is a extension function that converts paging data into set of objects that can be used to display data to UI
@@ -161,7 +145,6 @@ fun ListScreen(navController: NavHostController) {
                         }
                     }
                 }
-            }
         }
     }
 
@@ -193,8 +176,8 @@ private fun ListItemCard(
             navController.navigate("detail_screen/$encodedJson")
         },
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White
-        )
+            containerColor = Color.White,
+        ),
     ) {
         Row(
             modifier = Modifier.padding(vertical = 12.dp, horizontal = 15.dp),
@@ -204,14 +187,11 @@ private fun ListItemCard(
                 model = responseDataItem.owner.avatar_url,
                 contentDescription = "Logo description of the repo",
                 modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp),
-
-                )
+                    .height(100.dp)
+                    .height(100.dp))
 
             Column(modifier = Modifier.weight(1f).padding(horizontal = 10.dp)) {
                     Text(
-                        color = Color.Black,
                         text = buildAnnotatedString {
                             withStyle(style = BOLD_STYLE.toSpanStyle()) {
                                 append("ID: ")
@@ -222,7 +202,6 @@ private fun ListItemCard(
                         }
                     )
                 Text(
-                    color = Color.Black,
                     text = buildAnnotatedString {
                         withStyle(style = BOLD_STYLE.toSpanStyle()){
                             append("Name: ")
@@ -230,7 +209,7 @@ private fun ListItemCard(
                         withStyle(style = NORMAL_STYLE.toSpanStyle()){
                             append(responseDataItem.name)
                         }
-                    })
+                    }, maxLines = 1)
 
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp)) {
                     Image(

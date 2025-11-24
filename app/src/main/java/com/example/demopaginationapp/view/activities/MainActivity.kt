@@ -11,7 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.demopaginationapp.view.screens.CartScreen
+import com.example.demopaginationapp.view.screens.CouponScreen
 import com.example.demopaginationapp.view.screens.DetailScreen
+import com.example.demopaginationapp.view.screens.HomeScreen
 import com.example.demopaginationapp.view.screens.ListScreen
 import com.example.demopaginationapp.view.screens.ProductDetailScreen
 import com.example.demopaginationapp.view.screens.ProductScreen
@@ -36,13 +39,22 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = "product_screen"  //set the start destination - the first visible default fragment
+            startDestination = "home_screen"  //set the start destination - the first visible default fragment
         ) {
             composable("list_screen") { //used as key for navigation
                 ListScreen(navController)       //navigate to class
             }
+            composable("home_screen") { //used as key for navigation
+                HomeScreen(navController)       //navigate to class
+            }
             composable("product_screen") { //used as key for navigation
                 ProductScreen(navController)       //navigate to class
+            }
+            composable("coupon_screen") { //used as key for navigation
+                CouponScreen(navController)       //navigate to class
+            }
+            composable("cart_screen") { //used as key for navigation
+                CartScreen(navController)       //navigate to class
             }
             composable(
                 route = "detail_screen/{data}", // Define the argument name

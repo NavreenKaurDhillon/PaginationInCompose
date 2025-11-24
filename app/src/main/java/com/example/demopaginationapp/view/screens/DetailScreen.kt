@@ -1,13 +1,13 @@
 package com.example.demopaginationapp.view.screens
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,21 +26,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
+import com.example.demopaginationapp.utils.BOLD_STYLE
+import com.example.demopaginationapp.utils.NORMAL_STYLE
+import com.example.demopaginationapp.utils.TopAppBar
 import com.google.gson.Gson
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DetailScreen(data: String?, navController: NavController) {
@@ -57,7 +58,25 @@ fun DetailScreen(data: String?, navController: NavController) {
             null) as ResponseDataItem
     }
 
+    Scaffold(containerColor = Color.White,
+        topBar = {
+            TopAppBar("Details", true, navController)
+        }) { paddingValues ->
+        ShowRepoDetail(responseData, paddingValues, context, navController)
+    }
+
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ShowRepoDetail(
+    responseData: ResponseDataItem,
+    paddingValues: PaddingValues,
+    context: Context,
+    navController: NavController
+) {
     Column(modifier = Modifier
+        .padding(paddingValues)
         .fillMaxSize()
         .padding(20.dp),
     ) {
@@ -67,13 +86,12 @@ fun DetailScreen(data: String?, navController: NavController) {
             model = responseData.owner.avatar_url,
             contentDescription = "Logo description of the repo",
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 20.dp)
+                .padding(horizontal = 16.dp)
                 .width(120.dp)
                 .align(Alignment.CenterHorizontally)
                 .height(120.dp),
-            )
+        )
         Text(
-            color = Color.Black,
             text = buildAnnotatedString {
                 withStyle(BOLD_STYLE.toSpanStyle()){
                     append("ID :")
@@ -81,22 +99,21 @@ fun DetailScreen(data: String?, navController: NavController) {
                 withStyle(NORMAL_STYLE.toSpanStyle()){
                     append(responseData.id.toString())
                 }
-            }
+            }, modifier = Modifier.padding(top = 5.dp)
         )
         Text(
-                color = Color.Black,
-                text = buildAnnotatedString {
-                    withStyle(BOLD_STYLE.toSpanStyle()){
-                        append("Name :")
-                    }
-                    withStyle(NORMAL_STYLE.toSpanStyle()){
-                        append(responseData.name)
-                    }
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Name :")
                 }
-            )
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.name)
+                }
+            }, modifier = Modifier.padding(top = 5.dp)
+        )
 
         val annotatedString = buildAnnotatedString {
-            withStyle(BOLD_STYLE.toSpanStyle().copy(color = Color.Black)) {
+            withStyle(BOLD_STYLE.toSpanStyle()) {
                 append("Organisational URL : ")
             }
             pushStringAnnotation(
@@ -127,26 +144,63 @@ fun DetailScreen(data: String?, navController: NavController) {
                     context.startActivity(intent)
                 }
             },
-            modifier = Modifier
+             modifier = Modifier.padding(top = 5.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Owner :")
+                }
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.owner.id.toString())
+                }
+            }, modifier = Modifier.padding(top = 5.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Description :")
+                }
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.description)
+                }
+            }, modifier = Modifier.padding(top = 5.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Visibility :")
+                }
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.visibility)
+                }
+            }, modifier = Modifier.padding(top = 5.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Topics :")
+                }
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.topics.toString())
+                }
+            }, modifier = Modifier.padding(top = 5.dp)
         )
 
+        Spacer(Modifier.height(30.dp))
+        Button(onClick = {
+            navController.navigate("home_screen")
+        },
+            modifier = Modifier.padding(20.dp),
+            colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black, // Sets the background color of the button
+            contentColor = Color.White    // Sets the color of the text/icon inside the button,
+            ,
+        )) {
+            Text(text = "HOME",  textAlign = TextAlign.Center, style = BOLD_STYLE, color = Color.White, modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), fontSize = 18.sp)
 
-        Row(modifier = Modifier.weight(0.1f), verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = {
-                navController.navigate("product_screen")
-            },modifier = Modifier.weight(0.5f)) {
-                Text(text = "Goto Viewers",  textAlign = TextAlign.Center)
-
-            }
-            Spacer(Modifier.width(30.dp))
-            Button(onClick = {
-
-                navController.navigate("list_screen")
-            },modifier = Modifier.weight(0.5f)) {
-                Text(text = "Goto Home",  textAlign = TextAlign.Center)
-
-            }
         }
+
 
     }
 }

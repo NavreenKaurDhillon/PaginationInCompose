@@ -1,7 +1,7 @@
 package com.example.demopaginationapp.di
 
-import com.example.demopaginationapp.common.Constants.BASE_URL
-import com.example.demopaginationapp.common.Constants.PRODUCTS_BASE_URL
+import com.example.demopaginationapp.utils.Constants.BASE_URL
+import com.example.demopaginationapp.utils.Constants.PRODUCTS_BASE_URL
 import com.example.demopaginationapp.model.networking.ResponseHandler
 import com.example.demopaginationapp.model.networking.RetrofitInterface
 import com.example.demopaginationapp.model.repositories.AppRepository

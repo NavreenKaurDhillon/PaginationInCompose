@@ -1,6 +1,6 @@
 package com.example.demopaginationapp.model.networking
 
-import com.example.demopaginationapp.common.Constants
+import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.model.dataclasses.ProductResponseData
 import com.example.demopaginationapp.model.dataclasses.ResponseData
 import com.google.gson.JsonElement

@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
@@ -56,6 +58,7 @@ fun CartScreen(navController: NavHostController) {
     for (a in productViewModel.cartProducts)
         sum+=a.price
 
+
     Scaffold(
         topBar = { TopAppBar("My Cart", true, navController)},
         bottomBar =
@@ -71,7 +74,7 @@ fun CartScreen(navController: NavHostController) {
                         }, contentPadding = PaddingValues(10.dp)
                     ) {
                         Text(
-                            text = "Proceed to Checkout",
+                            text = "PROCEED TO CHECKOUT",
                             style = BOLD_STYLE,
                             color = Color.White,
                             textAlign = TextAlign.Center,
@@ -84,20 +87,26 @@ fun CartScreen(navController: NavHostController) {
             },
         containerColor = Color.White
     ) { paddingValues ->
+        val scrollState = rememberScrollState()
         Column(modifier = Modifier
             .padding(paddingValues)
-            .padding(horizontal = 15.dp)) {
+            .padding(horizontal = 15.dp)
+            .verticalScroll(scrollState)) {
             Log.d("ererhhre", "CartScreen: ${productViewModel.cartProducts}")
-            LazyColumn(contentPadding = PaddingValues(10.dp)) {
-                items(productViewModel.cartProducts.size) { item ->
-                    CartItemCard(productViewModel.cartProducts[item], productViewModel)
-                    Divider(
-                        color = Color.LightGray,
-                        thickness = 1.dp, modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
-                    )
+//            Column(contentPadding = PaddingValues(10.dp)) {
+                productViewModel.cartProducts.forEachIndexed { index, cartProduct ->
+                    CartItemCard(cartProduct, productViewModel)
+                    if (index < productViewModel.cartProducts.size - 1) {
+                        Divider(
+                            color = Color.LightGray,
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
+                        )
+                    }
                 }
-            }
+//            }
 if(productViewModel.cartProducts.size>0) {
+    Spacer(Modifier.height(20.dp))
     Row(
         modifier = Modifier
             .padding(15.dp)
@@ -160,8 +169,8 @@ if(productViewModel.cartProducts.size>0) {
                         .padding(top = 6.dp))
                 }
                 Row {
-                    Text(text = "Total", style = NORMAL_STYLE, fontSize = 18.sp, color = Color.Gray, modifier = Modifier.weight(0.5f))
-                    Text(text = "$ ${sum.toString()}", style = NORMAL_STYLE ,textAlign = TextAlign.End, fontSize = 18.sp, modifier = Modifier
+                    Text(text = "Total", style = BOLD_STYLE, fontSize = 18.sp, color = Color.Gray, modifier = Modifier.weight(0.5f))
+                    Text(text = "$ ${String.format("%.2f", sum)}", style = BOLD_STYLE ,textAlign = TextAlign.End, fontSize = 18.sp, modifier = Modifier
                         .weight(0.5f)
                         .padding(top = 6.dp))
                 }

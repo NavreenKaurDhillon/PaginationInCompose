@@ -20,12 +20,12 @@ import com.example.demopaginationapp.utils.TopAppBar
 @Composable
 fun CouponScreen(navController: NavHostController) {
     Scaffold(
-        topBar = { TopAppBar("My Cart", true, navController)},
+        topBar = { TopAppBar("Apply Coupons", true, navController)},
         containerColor = Color.White)
     { paddingValues ->
         Column (
             modifier = Modifier.padding(paddingValues).padding(10.dp)) {
-     Text(text = "No coupons found!", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp), textAlign = TextAlign.Center)
+     Text(text = "No coupons found!", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(vertical = 100.dp), textAlign = TextAlign.Center)
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -97,16 +98,28 @@ fun CustomGlideImage(
 @Composable
 fun RounderRecGlideImage(
     image: String,
+    sizeDp: Dp = 0.dp
 ){
     return   GlideImage(
         model = image,
         contentDescription = "Logo description of the repo",
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 10.dp)
-            .shadow(
-                elevation = 4.dp, // Use a noticeable elevation for testing
-                shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
-            .clip(RoundedCornerShape(15.dp)),
+        modifier = if (sizeDp == 0.dp){
+            Modifier
+                .fillMaxSize()
+                .padding( 8.dp)
+                .shadow(
+                    elevation = 4.dp, // Use a noticeable elevation for testing
+                    shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp))
+        } else {
+            Modifier
+                .height(sizeDp)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .shadow(
+                    elevation = 4.dp, // Use a noticeable elevation for testing
+                    shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp))
+        },
         contentScale = ContentScale.Fit)
 }

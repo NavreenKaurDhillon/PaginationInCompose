@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,7 @@ import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.dataclasses.Review
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
+import com.example.demopaginationapp.utils.RounderRecGlideImage
 import com.example.demopaginationapp.utils.TopAppBar
 import com.example.demopaginationapp.viewmodel.ProductViewModel
 import com.google.gson.Gson
@@ -74,7 +76,7 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
     val context = LocalContext.current
     val activity = context as ComponentActivity
     val productViewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
-   val decodedJsonString = remember(data) {
+    val decodedJsonString = remember(data) {
         if (data != null) {
             // Apply URLDecoder to convert '+' back to space ' '
             URLDecoder.decode(data, StandardCharsets.UTF_8.name())
@@ -82,12 +84,13 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
             null
         }
     }
-    val responseData : Product = remember(decodedJsonString) {
-        (if (decodedJsonString!=null){
+    val responseData: Product = remember(decodedJsonString) {
+        (if (decodedJsonString != null) {
             try {
                 Gson().fromJson(decodedJsonString, Product::class.java)
-            } catch (e: Exception){
-                Toast.makeText((context), "Exception caused is ${e.message}", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                Toast.makeText((context), "Exception caused is ${e.message}", Toast.LENGTH_LONG)
+                    .show()
                 Log.d("hhhh", "DetailScreen: exeption caused is ${e.message} ")
             }
 
@@ -95,7 +98,8 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
             null) as Product
     }
 
-    Scaffold(containerColor = Color.White,
+    Scaffold(
+        containerColor = Color.White,
         topBar = {
             TopAppBar("Details", true, navController)
         }) { paddingValues ->
@@ -120,40 +124,36 @@ fun ShowDetails(
     LaunchedEffect(pagerState) {
         // Coroutine loop for auto-scrolling
         while (true) {
-            delay(1000) // Delay for 3 seconds
+            delay(1500) // Delay for 3 seconds
             val nextPage = (pagerState.currentPage + 1) % pageCount
             pagerState.animateScrollToPage(nextPage)
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)
-        .padding( 20.dp)
-        .verticalScroll(scrollState)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .padding(horizontal = 20.dp)
+            .verticalScroll(scrollState)
     ) {
-
+        Spacer(Modifier.height(5.dp))
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp) // Set a fixed height for the banner
+                .height(220.dp) // Set a fixed height for the banner
         ) { page ->
-            GlideImage(
-                model = responseData.images[page],
-                contentDescription = "Logo description of the repo",
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+            RounderRecGlideImage(responseData.images[page])
         }
+        Spacer(Modifier.height(20.dp))
         Text(
             color = Color.Black,
             text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
+                withStyle(BOLD_STYLE.toSpanStyle()) {
                     append("Name :")
                 }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
+                withStyle(NORMAL_STYLE.toSpanStyle()) {
                     append(responseData.title)
                 }
             }
@@ -161,10 +161,10 @@ fun ShowDetails(
         Text(
             color = Color.Black,
             text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
+                withStyle(BOLD_STYLE.toSpanStyle()) {
                     append("Price :")
                 }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
+                withStyle(NORMAL_STYLE.toSpanStyle()) {
                     append(responseData.price.toString())
                 }
             }
@@ -172,10 +172,10 @@ fun ShowDetails(
         Text(
             color = Color.Black,
             text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
+                withStyle(BOLD_STYLE.toSpanStyle()) {
                     append("Brand :")
                 }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
+                withStyle(NORMAL_STYLE.toSpanStyle()) {
                     append(responseData.brand)
                 }
             }
@@ -183,10 +183,10 @@ fun ShowDetails(
         Text(
             color = Color.Black,
             text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
+                withStyle(BOLD_STYLE.toSpanStyle()) {
                     append("Warranty :")
                 }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
+                withStyle(NORMAL_STYLE.toSpanStyle()) {
                     append(responseData.warrantyInformation)
                 }
             }
@@ -194,52 +194,95 @@ fun ShowDetails(
         Text(
             color = Color.Black,
             text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
+                withStyle(BOLD_STYLE.toSpanStyle()) {
                     append("Description :")
                 }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
+                withStyle(NORMAL_STYLE.toSpanStyle()) {
                     append(responseData.description)
                 }
             },
             maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3,  //max 3 lines for description
             overflow = TextOverflow.Ellipsis //show ... if text is more than 3 lines
         )
-        TextButton(onClick = {
-            descriptionExpanded = !descriptionExpanded
-        }, ) {
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(painter =  if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(R.drawable.baseline_keyboard_arrow_down_24), tint = Color.Blue, contentDescription = "expand text", modifier = Modifier.size(25.dp).padding(end = 5.dp))
-                Text(text = if (descriptionExpanded) "Show Less" else "Show More", fontSize = 14.sp,style = NORMAL_STYLE, color = Color.Blue,)
+        TextButton(
+            onClick = {
+                descriptionExpanded = !descriptionExpanded
+            },
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
+                        R.drawable.baseline_keyboard_arrow_down_24
+                    ),
+                    tint = Color.Blue,
+                    contentDescription = "expand text",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .padding(end = 5.dp)
+                )
+                Text(
+                    text = if (descriptionExpanded) "Show Less" else "Show More",
+                    fontSize = 14.sp,
+                    style = NORMAL_STYLE,
+                    color = Color.Blue,
+                    textDecoration = TextDecoration.Underline
+                )
             }
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(responseData?.reviews?.size?:0) {topItem->
-                responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it ) }
+            items(responseData?.reviews?.size ?: 0) { topItem ->
+                responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
             }
         }
         Spacer(Modifier.height(20.dp))
-        Button(onClick = {
-            productViewModel.cartProducts.add(responseData)
-            Log.d("ererhhre", "CartScreen:  aaddedd ${productViewModel.cartProducts}")
-            navController.navigate("cart_screen")
-        },modifier = Modifier.padding(8.dp).align(Alignment.CenterHorizontally).fillMaxWidth(),
+        Button(
+            onClick = {
+                if (!addedToCart)
+                    productViewModel.cartProducts.add(responseData)
+                Log.d("ererhhre", "CartScreen:  aaddedd ${productViewModel.cartProducts}")
+                if (addedToCart)
+                    navController.navigate("cart_screen")
+            }, modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black, // Sets the background color of the button
                 contentColor = Color.White    // Sets the color of the text/icon inside the button
-            )) {
-            Icon(painter =  if (addedToCart) painterResource(R.drawable.cart_icon) else painterResource(R.drawable.add_to_cart_icon),
-                contentDescription = "cart")
-            Text(text =
-                if (addedToCart) "GO TO CART" else "ADD TO CART",  textAlign = TextAlign.Center, style = BOLD_STYLE, color = Color.White, modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp))
+            )
+        ) {
+            Icon(
+                painter = if (addedToCart) painterResource(R.drawable.cart_icon) else painterResource(
+                    R.drawable.add_to_cart_icon
+                ),
+                contentDescription = "cart"
+            )
+            Text(
+                text =
+                    if (addedToCart) "GO TO CART" else "ADD TO CART",
+                textAlign = TextAlign.Center,
+                style = BOLD_STYLE,
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp)
+            )
         }
-        ElevatedButton (onClick = {
-            navController.navigate("product_screen")
-        },modifier = Modifier.fillMaxWidth().padding(8.dp),
+        ElevatedButton(
+            onClick = {
+                navController.navigate("product_screen")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White, // Sets the background color of the button
                 contentColor = Color.Black    // Sets the color of the text/icon inside the button
-            ), ) {
-            Text(text = "SHOW SIMILAR",  textAlign = TextAlign.Center, style = BOLD_STYLE)
+            ),
+        ) {
+            Text(text = "SHOW SIMILAR", textAlign = TextAlign.Center, style = BOLD_STYLE)
 
         }
 
@@ -251,14 +294,15 @@ fun ShowDetails(
 fun ReviewItemGrid(review: Review) {
     ElevatedCard(
         modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 5.dp)
-                .width(200.dp),
+            .padding(vertical = 10.dp, horizontal = 5.dp)
+            .width(200.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = Color.White
-        ) ,
+        ),
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 5.dp
-        ))  {
+        )
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
             Text(
@@ -269,16 +313,18 @@ fun ReviewItemGrid(review: Review) {
                 modifier = Modifier.padding(top = 5.dp)
             )
             Text(
-                text = review.comment?:"",
+                text = review.comment ?: "",
                 style = NORMAL_STYLE,
                 color = Color.Gray,
                 maxLines = 3,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(top = 5.dp))
+                modifier = Modifier.padding(top = 5.dp)
+            )
             Text(
                 text = "⭐ ${review.rating.toString()}",
                 style = NORMAL_STYLE,
-                fontSize = 14.sp,modifier = Modifier.padding(top = 5.dp))
+                fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp)
+            )
         }
     }
 }

@@ -1,24 +1,10 @@
 package com.example.demopaginationapp.utils
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import com.example.demopaginationapp.model.dataclasses.BottomNavItem
-
 object Constants {
-    val BottomNavItems = listOf(
-        BottomNavItem(
-            tabName = "list_screen",
-            tabIcon = Icons.Filled.Home,
-            destination = "list_screen"
-        ),
 
-        BottomNavItem(
-            tabName = "products_screen",
-            tabIcon = Icons.Filled.Home,
-            destination = "products"
-        ),
-
-
-        )
+    const val LISTING ="users/google/repos"
+    const val PRODUCTS_LIST ="products"
+    const val BASE_URL ="https://api.github.com/"
+    const val PRODUCTS_BASE_URL ="https://dummyjson.com/"
+    const val dummyDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
 }

@@ -78,27 +78,21 @@ import java.nio.charset.StandardCharsets
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ProductScreen( navController: NavHostController) {
-
     val viewModel : ProductViewModel = hiltViewModel()
     val productsResource by viewModel.products.observeAsState()
-
     var showDialog by remember { mutableStateOf(false) }
-
     // Handle the initial null state before the first emission, or a null-emitting error
     val state = productsResource ?: Resource.loading(null)
-
-    // 2. Handle the different states (Loading, Success, Error)
     when (productsResource?.status) {
         Status.LOADING -> {
-            // Show a full-screen loading indicator
+            // Show a loading indicator
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
         Status.SUCCESS -> {
             // Data loaded successfully
-            val data = state.data?.products // Safely access the data
-
+            val data = state.data?.products
             if (data?.isNotEmpty() == true) {
                 Log.d("ekkhejfkjewjfk", "ProductScreen: ounn   $showDialog")
                 if(showDialog){
@@ -115,23 +109,18 @@ fun ProductScreen( navController: NavHostController) {
                         },
                         onFilterClear = {
                             // viewModel.clearFilters() // Implement this
-                            showDialog = false
-                        }
-                    )
+                            showDialog = false })
                 }
-
                 Scaffold(
                     topBar = {
                         com.example.demopaginationapp.utils.TopAppBar(
                             "Products List",
                             true,
-                            navController
-                        )
+                            navController)
                     },
                     bottomBar = {
                         SortFilterBottomBar(
-                            onFilterClick = { showDialog = true }
-                        )
+                            onFilterClick = { showDialog = true })
                     },
                     containerColor = Color.White,
                 ) { paddingValues ->
@@ -146,14 +135,10 @@ fun ProductScreen( navController: NavHostController) {
             Text(
                 text = "Failed to load products: ${state.message}",
                 color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
+                modifier = Modifier.padding(16.dp))
         }
-
         else -> {}
     }
-
-
 }
 
 
@@ -166,19 +151,15 @@ fun ShowProductsList(
 ) {
 
         LazyVerticalGrid(
-            // 2. Define the columns: GridCells.Fixed(2) creates exactly two columns
+            // GridCells.Fixed(2) creates exactly two columns
             columns = GridCells.Fixed(2),
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxWidth(),
-            // 3. Add padding around the entire grid content
             contentPadding = PaddingValues(12.dp),
-
-            // 4. Set the spacing between rows and columns
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            // 5. Populate the grid using the items extension function
             items(data.size) { item ->
                 Log.d("kejfhgfwfew", "ProductScreen: ${data.size}")
                 GridItemCard(data[item], navController, 0.dp)
@@ -190,7 +171,6 @@ fun ShowProductsList(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GridItemCard(item: Product, navController: NavHostController, width : Dp) {
-
     ElevatedCard(
         modifier = if(width>0.dp){
             Modifier
@@ -215,33 +195,25 @@ fun GridItemCard(item: Product, navController: NavHostController, width : Dp) {
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 12.dp
         ))  {
-
         Column(modifier = Modifier.padding(12.dp)) {
-
             GlideImage(
                 model = item.images[0],
                 contentDescription = "Product image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp),
-
-                )
+                    .height(150.dp),)
             Text(
                 text = item.title,
                 style = BOLD_STYLE,
                 color = Color.Black,
                 maxLines = 1,
-                modifier = Modifier.padding(top = 5.dp)
-            )
+                modifier = Modifier.padding(top = 5.dp))
             Text(
                 text = item.availabilityStatus?:"",
                 style = NORMAL_STYLE,
                 color = Color.Gray,
                 maxLines = 3,
-                modifier = Modifier.padding(top = 5.dp)
-            )
-
-
+                modifier = Modifier.padding(top = 5.dp))
             Text(
                 text = buildAnnotatedString {
                     withStyle(BOLD_STYLE.toSpanStyle()){
@@ -251,21 +223,14 @@ fun GridItemCard(item: Product, navController: NavHostController, width : Dp) {
                         append("$"+item.price.toString())
                     }
                 },
-                modifier = Modifier.padding(top = 5.dp)
-            )
-
-            Log.d("ekkhejfkjewjfk", "GridItemCard:${item.rating.toString()} ")
+                modifier = Modifier.padding(top = 5.dp))
                 Text(
-                    //error
-
                     text = "⭐ ${item.rating.toString()}",
                     style = NORMAL_STYLE,
-                    fontSize = 14.sp
-                )
+                    fontSize = 14.sp)
         }
     }
 }
-
 
 @Composable
 fun SortFilterBottomBar(
@@ -310,7 +275,6 @@ fun SortFilterBottomBar(
     }
 }
 
-
 @Composable
 fun SortFilterDialog(
     currentSortOption: String,
@@ -319,22 +283,14 @@ fun SortFilterDialog(
     onFilterApplied: (brand: String?, maxPrice: Double?) -> Unit,
     onFilterClear: () -> Unit
 ) {
-    // Local states for filter inputs
-    val availableBrands = remember { listOf("None", "Sony", "Logitech", "Dell", "Razer", "Anker", "Apple", "Samsung") }
-    var selectedBrand by remember { mutableStateOf("None") }
-    var maxPriceText by remember { mutableStateOf("") }
-
     // List of sorting options
     val sortOptions = listOf("None", "Price Low to High", "Price High to Low", "Rating High to Low")
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Sort Options") },
         containerColor = Color.White,
         text = {
             Column {
-
-                // --- SORTING OPTIONS ---
                 Text("Sort By:", fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(8.dp))
                 FlowRow(
@@ -345,49 +301,20 @@ fun SortFilterDialog(
                         FilterChip(
                             selected = currentSortOption == option,
                             onClick = { onSortSelected(option) },
-                            label = { Text(option) },
-
-                        )
+                            label = { Text(option) },)
                     }
                 }
-
                 // Separator
                 Divider(Modifier.padding(vertical = 12.dp))
-
-                /* // --- FILTER BY BRAND ---
-                 Text("Filter By Brand:", fontWeight = FontWeight.SemiBold)
-                 Spacer(Modifier.height(8.dp))
-                 // Dropdown or another selection method for brand
-                 OutlinedTextField(
-                     value = selectedBrand,
-                     onValueChange = { selectedBrand = it },
-                     label = { Text("Brand") },
-                     readOnly = true,
-                     trailingIcon = { *//* IconButton for dropdown *//* }
-                    // A proper dropdown (ExposedDropdownMenuBox) is complex but better
-                )*/
-
-                /*  // --- FILTER BY MAX PRICE ---
-                  Spacer(Modifier.height(8.dp))
-                  Text("Filter By Max Price:", fontWeight = FontWeight.SemiBold)
-                  OutlinedTextField(
-                      value = maxPriceText,
-                      onValueChange = { newValue ->
-                          // Only allow numerical input
-                          maxPriceText = newValue.filter { it.isDigit() || it == '.' }
-                      },
-                      label = { Text("Max Price (€/$)") },
-                      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                  )*/
             }
         },
         confirmButton = {
-            Button(onClick = {
+          /*  Button(onClick = {
                 val maxPrice = maxPriceText.toDoubleOrNull()
                 onFilterApplied(selectedBrand, maxPrice)
             }) {
                 Text("APPLY FILTERS")
-            }
+            }*/
         },
         dismissButton = {
 

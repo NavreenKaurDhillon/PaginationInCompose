@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -23,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -35,9 +40,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
+import com.example.demopaginationapp.utils.RounderRecGlideImage
 import com.example.demopaginationapp.utils.TopAppBar
 import com.google.gson.Gson
 
@@ -78,19 +85,13 @@ fun ShowRepoDetail(
     Column(modifier = Modifier
         .padding(paddingValues)
         .fillMaxSize()
-        .padding(20.dp),
+        .padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
     ) {
         val uriHandler = LocalUriHandler.current
         val url = responseData.owner.organizations_url
-        GlideImage(
-            model = responseData.owner.avatar_url,
-            contentDescription = "Logo description of the repo",
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .width(120.dp)
-                .align(Alignment.CenterHorizontally)
-                .height(120.dp),
-        )
+        Spacer(Modifier.height(5.dp))
+        RounderRecGlideImage(responseData.owner.avatar_url, 200.dp)
+        Spacer(Modifier.height(15.dp))
         Text(
             text = buildAnnotatedString {
                 withStyle(BOLD_STYLE.toSpanStyle()){
@@ -162,7 +163,7 @@ fun ShowRepoDetail(
                     append("Description :")
                 }
                 withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.description)
+                    append(Constants.dummyDescription)
                 }
             }, modifier = Modifier.padding(top = 5.dp)
         )
@@ -179,10 +180,19 @@ fun ShowRepoDetail(
         Text(
             text = buildAnnotatedString {
                 withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Topics :")
+                    append("Private:")
                 }
                 withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.topics.toString())
+                    append(responseData.private.toString())
+                }
+            }, modifier = Modifier.padding(top = 5.dp))
+        Text(
+            text = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()){
+                    append("Default branch:")
+                }
+                withStyle(NORMAL_STYLE.toSpanStyle()){
+                    append(responseData.default_branch.toString())
                 }
             }, modifier = Modifier.padding(top = 5.dp)
         )

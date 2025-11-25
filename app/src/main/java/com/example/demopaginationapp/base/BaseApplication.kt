@@ -1,4 +1,4 @@
-package com.example.demopaginationapp.common
+package com.example.demopaginationapp.base
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

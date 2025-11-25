@@ -211,7 +211,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
             navController.navigate("product_detail_screen/$encodedJson")
         },
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 12.dp
+            defaultElevation = 5.dp
         ))  {
         Row (modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             GlideImage(

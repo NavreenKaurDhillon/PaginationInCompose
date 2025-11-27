@@ -250,7 +250,6 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
             Spacer(Modifier.height(15.dp))
             Text(text = "Top Brands", style = BOLD_STYLE, fontSize = 18.sp)
             LazyHorizontalGrid(
-                // Define the columns: GridCells.Fixed(2) creates exactly two columns
                 rows = GridCells.Fixed(2),
                 modifier = Modifier
                     .height(200.dp)
@@ -259,7 +258,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // 5. Populate the grid using the items extension function
+
                 items(data?.size ?: 0) { item ->
                     Log.d("kejfhgfwfew", "ProductScreen: ${data?.size ?: 0}")
                     data?.get(item)?.let {
@@ -398,9 +397,9 @@ fun BottomNavigationBar(navController: NavHostController) {
         // observe the backstack
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        // Bottom nav items we declared
+        // Bottom nav items
         Constants.BottomNavItems.forEach { navItem ->
-            // Place the bottom nav items
+
             NavigationBarItem(
                 // it currentRoute is equal then its selected route
                 selected = currentRoute == navItem.destination,

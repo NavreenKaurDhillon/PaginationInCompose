@@ -88,7 +88,6 @@ fun ShowRepoDetail(
         .fillMaxSize()
         .padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
     ) {
-        val uriHandler = LocalUriHandler.current
         val url = responseData.owner.organizations_url
         Spacer(Modifier.height(5.dp))
         RounderRecGlideImage(responseData.owner.avatar_url, 200.dp)
@@ -204,8 +203,8 @@ fun ShowRepoDetail(
         },
             modifier = Modifier.padding(20.dp),
             colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black, // Sets the background color of the button
-            contentColor = Color.White    // Sets the color of the text/icon inside the button,
+            containerColor = Color.Black,
+            contentColor = Color.White
             ,
         )) {
             Text(text = "HOME",  textAlign = TextAlign.Center, style = BOLD_STYLE, color = Color.White, modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), fontSize = 18.sp)

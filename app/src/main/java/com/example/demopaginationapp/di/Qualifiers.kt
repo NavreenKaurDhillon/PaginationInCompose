@@ -11,12 +11,12 @@ annotation class ProductBaseUrl
 annotation class GoogleBaseUrl
 
 
-// Qualifier for the RetrofitInterface instance and the AppRepository instance (Google API scope)
+// Qualifier for Google API scope
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class GoogleApi
 
-// Qualifier for the RetrofitInterface instance and the AppRepository instance (Product API scope)
+// Qualifier for Product API scope
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ProductApi

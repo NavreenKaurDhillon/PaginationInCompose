@@ -1,6 +1,5 @@
 package com.example.demopaginationapp.utils
 
-import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -51,7 +49,7 @@ fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController
                     navController.popBackStack()
                 }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Standard back arrow icon
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Go back",
                         tint = Color.Black,
                         modifier = Modifier.size(30.dp)
@@ -65,7 +63,7 @@ fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController
                   navController.navigate(Screens.ReposList)
               }) {
                   Image(
-                     painter = painterResource(R.drawable.outline_event_list_24), // Standard back arrow icon
+                     painter = painterResource(R.drawable.outline_event_list_24),
                       contentDescription = "Go back",
                       modifier = Modifier.size(30.dp)
                   )
@@ -76,7 +74,7 @@ fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController
                   navController.navigate(Screens.ProductsList)
               }) {
                   Icon(
-                      imageVector = Icons.Filled.Search, // Standard back arrow icon
+                      imageVector = Icons.Filled.Search,
                       contentDescription = "Go back",
                       modifier = Modifier.size(30.dp)
                   )
@@ -103,7 +101,7 @@ fun CustomGlideImage(
                 .size(sizeDp)
                 .padding(paddingDp)
                 .shadow(
-                    elevation = elevationDp, // Use a noticeable elevation for testing
+                    elevation = elevationDp,
                     shape = imageShape)
                 .background(Color.White, shape = imageShape)
                 .clip(imageShape)
@@ -113,7 +111,7 @@ fun CustomGlideImage(
                 .fillMaxWidth()
                 .padding(paddingDp)
                 .shadow(
-                    elevation = elevationDp, // Use a noticeable elevation for testing
+                    elevation = elevationDp,
                     shape = imageShape)
                 .background(Color.White, shape = imageShape)
                 .clip(imageShape)
@@ -139,7 +137,7 @@ fun RounderRecGlideImage(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
                 .shadow(
-                    elevation = 4.dp, // Use a noticeable elevation for testing
+                    elevation = 4.dp,
                     shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
                 .clip(RoundedCornerShape(15.dp))
         },

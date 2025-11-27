@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,8 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.placeholder
-import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.viewmodel.ProductViewModel
 
@@ -80,25 +76,22 @@ fun SearchScreen(navController: NavHostController) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    // 1. APPLY THE ROUNDED BACKGROUND TO THE ENTIRE TEXT FIELD AREA
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(16.dp),
                     )
                     .padding(horizontal = 8.dp),
                 colors = TextFieldDefaults.colors(
-                    // Set the container color to transparent, as we are using the Modifier background
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
 
-                    // Remove the indicator line below the TextField
+                    // indicator line properties
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
                 trailingIcon = {
-                    // Clear text button
                     if (searchText.isNotEmpty()) {
                         IconButton(onClick = { searchText = "" }) {
                             Icon(Icons.Default.Clear, contentDescription = "Clear Search")

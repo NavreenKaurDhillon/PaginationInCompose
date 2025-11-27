@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.demopaginationapp.navigation.AppNavHostSetup
-import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.navigation.bottomBarRoutes
 import com.example.demopaginationapp.view.screens.BottomNavigationBar
 import com.example.demopaginationapp.view.theme.DemoPaginationAppTheme
@@ -35,7 +34,7 @@ class MainActivity : ComponentActivity() {
                             BottomNavigationBar(navController = navController)
                     },
                 ){ paddingValues ->
-                    // Nav host: where screens are placed
+                    // Nav host
                     AppNavHostSetup(navController = navController, padding = paddingValues)
                 }
             }

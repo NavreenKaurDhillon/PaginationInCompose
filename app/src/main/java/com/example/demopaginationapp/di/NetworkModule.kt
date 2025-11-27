@@ -25,47 +25,24 @@ import javax.inject.Singleton
 object NetworkModule {
 
 
-
-  /*  @Singleton
-    @Provides
-    fun provideBaseUrl(): String {
-        return BASE_URL
-    }*/
   @GoogleBaseUrl
   @Provides
   fun provideGoogleBaseUrl(): String {
-      return BASE_URL
+      return BASE_URL  //used to get repos list
   }
 
     @ProductBaseUrl
     @Provides
     fun provideProductBaseUrl(): String {
-        return PRODUCTS_BASE_URL
+        return PRODUCTS_BASE_URL   //used to get products list
     }
 
     @Singleton
     @Provides
     fun provideLoggingInterceptor(): Interceptor {
         return Interceptor { chain ->
-            val request: Request
-            /*   if (!getFromDatabase(Constants.AUTH_TOKEN,"").isNullOrEmpty()) {
-                   Log.d("tokennn", "provideLoggingInterceptor: ${getFromDatabase(Constants.AUTH_TOKEN,"")}")
-                   val auth :String = getFromDatabase(Constants.AUTH_TOKEN,"")
-                   Log.e("Authorization", "" + getFromDatabase(Constants.AUTH_TOKEN,""))
-                   request = chain.request().newBuilder().header("Authorization", "Bearer $auth")
-                       .addHeader("Content-Type", "application/json")
-                       .addHeader("Accept", "application/json")
-                       .addHeader("secretkey","U2FsdGVkX18cWH+rfiUQiJ0Vn6M8vIfT/2pup77qAzU2mkMfLGJqtGOjoGlfgGRn")
-                       .addHeader("publishkey","U2FsdGVkX1+iE5oRiAoYXkDa3fkrK3pjpPn27JNc1tkcoPAE+rk3OMJesdQp03bE")
-                       .build()
-               } else {*/
-            request = chain.request().newBuilder()
-//                    .addHeader("Accept", "application/json")
-//                    .addHeader("Content-Type", "application/json")
-//                    .addHeader("secretkey","U2FsdGVkX18cWH+rfiUQiJ0Vn6M8vIfT/2pup77qAzU2mkMfLGJqtGOjoGlfgGRn")
-//                    .addHeader("publishkey","U2FsdGVkX1+iE5oRiAoYXkDa3fkrK3pjpPn27JNc1tkcoPAE+rk3OMJesdQp03bE")
+            val request: Request = chain.request().newBuilder()
                 .build()
-//        }
             chain.proceed(request)
         }
     }

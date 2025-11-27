@@ -112,11 +112,11 @@ fun ProductScreen(navController: NavHostController) {
                 showDialog = false
             },
             onFilterApplied = { brand, maxPrice ->
-                // viewModel.applyFilters(brand, maxPrice)
+
                 showDialog = false
             },
             onFilterClear = {
-                // viewModel.clearFilters()
+
                 showDialog = false
             })
     }
@@ -172,7 +172,6 @@ fun ShowProductsList(
     showFavIcon: Boolean = true
 ) {
     LazyVerticalGrid(
-        // GridCells.Fixed(2) creates exactly two columns
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .padding(paddingValues)
@@ -304,9 +303,9 @@ fun SortFilterBottomBar(
             Spacer(
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 15.dp)
-                    .width(1.dp) // This sets the thickness
-                    .height(30.dp) // Explicit height for the line
-                    .background(Color.LightGray) // This sets the color
+                    .width(1.dp) // thickness
+                    .height(30.dp) //  height for the line
+                    .background(Color.LightGray) //  color
             )
             TextButton(onClick = onFilterClick, modifier = Modifier.weight(0.5f)) {
                 Image(

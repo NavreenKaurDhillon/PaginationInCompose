@@ -3,14 +3,17 @@ package com.example.demopaginationapp.view.screens
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +46,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.Product
+import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.TopAppBar
@@ -56,21 +60,133 @@ fun CartScreen(navController: NavHostController) {
     val productViewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
     var sum = 0.0
     for (a in productViewModel.cartProducts)
-        sum+=a.price
+        sum += a.price
 
+    BackHandler(enabled = true) {
+        //Handle the back press manually -> navigate to home
+        navController.navigate(Screens.Home) {
+            popUpTo(Screens.Home) {
+                inclusive = true  // remove other entries and goto home
+            }
+            launchSingleTop = true
+        }
+    }
 
     Scaffold(
-        topBar = { TopAppBar("My Cart", true, navController)},
-        bottomBar =
-            { BottomAppBar(containerColor = Color.Blue, contentColor = Color.White){
+        topBar = { TopAppBar("My Cart", false, navController) },
+        containerColor = Color.White
+    ) { paddingValues ->
+        val scrollState = rememberScrollState()
+            if (productViewModel.cartProducts.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(horizontal = 15.dp)
+                        .verticalScroll(scrollState)
+                        .fillMaxSize()
+                ) {
+                    productViewModel.cartProducts.forEachIndexed { index, cartProduct ->
+                        CartItemCard(cartProduct, productViewModel)
+                        if (index < productViewModel.cartProducts.size - 1) {
+                            Divider(
+                                color = Color.LightGray,
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 4.dp,
+                                shape = MaterialTheme.shapes.large
+                            )
+                            .background(
+                                color = Color.White,
+                                shape = MaterialTheme.shapes.large
+                            )
+                            .clickable(
+                                onClick = {
+                                    //open coupons screen
+                                    navController.navigate(Screens.Coupons)
+                                },
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(Modifier.width(15.dp))
+                        Image(
+                            painter = painterResource(R.drawable.discount),
+                            contentDescription = "Coupon",
+                            Modifier.size(25.dp)
+                        )
+                        Text(
+                            text = "Apply Coupon",
+                            style = BOLD_STYLE,
+                            modifier = Modifier.padding(vertical = 15.dp),
+                            fontSize = 18.sp
+                        )
+                    }
+                    Spacer(Modifier.height(20.dp))
+                    Column(modifier = Modifier.padding(15.dp)) {
+                        Text(text = "Order Details", style = BOLD_STYLE, fontSize = 20.sp)
+                        Divider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 2.dp, // Thicker line
+                            color = Color.LightGray  // Custom color
+                        )
+                        Row {
+                            Text(
+                                text = "Items",
+                                style = NORMAL_STYLE,
+                                color = Color.Gray,
+                                modifier = Modifier.weight(0.5f),
+                                fontSize = 18.sp
+                            )
+                            Text(
+                                text = productViewModel.cartProducts.size.toString(),
+                                style = NORMAL_STYLE,
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .padding(top = 6.dp)
+                            )
+                        }
+                        Row {
+                            Text(
+                                text = "Total",
+                                style = BOLD_STYLE,
+                                fontSize = 18.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.weight(0.5f)
+                            )
+                            Text(
+                                text = "$ ${String.format("%.2f", sum)}",
+                                style = BOLD_STYLE,
+                                textAlign = TextAlign.End,
+                                fontSize = 18.sp,
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .padding(top = 6.dp)
+                            )
+                        }
+                    }
 
-
-                if(productViewModel.cartProducts.size>0) {
+                    Spacer(Modifier.height(20.dp))
                     TextButton(
+                        modifier = Modifier.background(color = Color.Blue),
                         onClick = {
-                            Toast.makeText(context, "Order placed successfully", Toast.LENGTH_LONG)
+                            Toast.makeText(
+                                context,
+                                "Order placed successfully",
+                                Toast.LENGTH_LONG
+                            )
                                 .show()
-                            navController.navigate("home_screen")
+                            navController.navigate(Screens.Home)
                         }, contentPadding = PaddingValues(10.dp)
                     ) {
                         Text(
@@ -81,101 +197,16 @@ fun CartScreen(navController: NavHostController) {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-
                 }
-                    }
-            },
-        containerColor = Color.White
-    ) { paddingValues ->
-        val scrollState = rememberScrollState()
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 15.dp)
-            .verticalScroll(scrollState)) {
-            Log.d("ererhhre", "CartScreen: ${productViewModel.cartProducts}")
-//            Column(contentPadding = PaddingValues(10.dp)) {
-                productViewModel.cartProducts.forEachIndexed { index, cartProduct ->
-                    CartItemCard(cartProduct, productViewModel)
-                    if (index < productViewModel.cartProducts.size - 1) {
-                        Divider(
-                            color = Color.LightGray,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
-                        )
-                    }
-                }
-//            }
-if(productViewModel.cartProducts.size>0) {
-    Spacer(Modifier.height(20.dp))
-    Row(
-        modifier = Modifier
-            .padding(15.dp)
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = MaterialTheme.shapes.large
-            )
-            .background(
-                color = Color.White,
-                shape = MaterialTheme.shapes.large
-            )
-            .clickable(
-                onClick = {
-                    //open coupons screen
-                    navController.navigate("coupon_screen")
-                },
-            ),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(15.dp))
-        Image(
-            painter = painterResource(R.drawable.discount),
-            contentDescription = "Coupon",
-            Modifier.size(25.dp)
-        )
-        Text(
-            text = "Apply Coupon",
-            style = BOLD_STYLE,
-            modifier = Modifier.padding(vertical = 15.dp,),
-            fontSize = 18.sp
-        )
-    }
-}
-            else{
-    Text(
-        text = "No Products",
-        style = BOLD_STYLE,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .padding(vertical = 15.dp,)
-            .fillMaxWidth(),
-        fontSize = 18.sp
-    )
-            }
-
-            Spacer(Modifier.height(20.dp))
-            Column(modifier = Modifier.padding(15.dp)) {
-                Text(text = "Order Details", style = BOLD_STYLE, fontSize = 20.sp)
-                Divider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 2.dp, // Thicker line
-                    color = Color.LightGray  // Custom color
-                )
-                Row {
-                    Text(text = "Items", style = NORMAL_STYLE, color = Color.Gray, modifier = Modifier.weight(0.5f), fontSize = 18.sp)
-                    Text(text = productViewModel.cartProducts.size.toString(), style = NORMAL_STYLE, fontSize = 18.sp, textAlign = TextAlign.End, modifier = Modifier
-                        .weight(0.5f)
-                        .padding(top = 6.dp))
-                }
-                Row {
-                    Text(text = "Total", style = BOLD_STYLE, fontSize = 18.sp, color = Color.Gray, modifier = Modifier.weight(0.5f))
-                    Text(text = "$ ${String.format("%.2f", sum)}", style = BOLD_STYLE ,textAlign = TextAlign.End, fontSize = 18.sp, modifier = Modifier
-                        .weight(0.5f)
-                        .padding(top = 6.dp))
+            } else {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center, ) {
+                    Text(
+                        text = "No products found!",
+                        style = NORMAL_STYLE,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
-        }
     }
 }
 
@@ -183,29 +214,47 @@ if(productViewModel.cartProducts.size>0) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CartItemCard(item: Product, productViewModel: ProductViewModel) {
-        Row(verticalAlignment = Alignment.CenterVertically
-        ) {
-            GlideImage(
-                model = item.images[0],
-                contentDescription = item.title,
-                modifier = Modifier.size(100.dp)
-            )
-            Column(modifier = Modifier
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GlideImage(
+            model = item.images[0],
+            contentDescription = item.title,
+            modifier = Modifier.size(100.dp)
+        )
+        Column(
+            modifier = Modifier
                 .weight(1f)
-                .padding(start = 15.dp)) {
-                Text(text = item.title, style = BOLD_STYLE, color = Color.Black, modifier = Modifier.padding(top = 4.dp))
-                Text(text = "Brand: ${item.brand}", style = NORMAL_STYLE, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
-                Text(text = "$ ${item.price.toString()}", style = BOLD_STYLE, color = Color.Black, modifier = Modifier.padding(top = 4.dp))
-            }
-
-            IconButton(onClick = {
-                productViewModel.cartProducts.remove(item)
-            }) {
-                Image(
-                    painter = painterResource(R.drawable.baseline_delete_24),
-                    modifier = Modifier.size(20.dp),
-                    contentDescription = "Delete cart product"
-                )
-            }
+                .padding(start = 15.dp)
+        ) {
+            Text(
+                text = item.title,
+                style = BOLD_STYLE,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Brand: ${item.brand}",
+                style = NORMAL_STYLE,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "$ ${item.price.toString()}",
+                style = BOLD_STYLE,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
+
+        IconButton(onClick = {
+            productViewModel.cartProducts.remove(item)
+        }) {
+            Image(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                modifier = Modifier.size(20.dp),
+                contentDescription = "Delete cart product"
+            )
+        }
+    }
 }

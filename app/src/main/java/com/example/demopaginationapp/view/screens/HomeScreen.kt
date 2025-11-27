@@ -1,6 +1,10 @@
 package com.example.demopaginationapp.view.screens
 
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,30 +23,40 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -51,52 +65,65 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.networking.Resource
 import com.example.demopaginationapp.model.networking.Status
+import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
+import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.utils.CustomGlideImage
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.RounderRecGlideImage
-import com.example.demopaginationapp.utils.TopAppBar
+import com.example.demopaginationapp.utils.SMALL_BOLD_STYLE
 import com.example.demopaginationapp.viewmodel.ProductViewModel
-import com.google.gson.Gson
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import kotlinx.coroutines.delay
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val viewModel : ProductViewModel = hiltViewModel()
-    val productsResource by viewModel.products.observeAsState()
+    var backPressed : Boolean= false
+
+    val context = LocalContext.current
+    val activity = context as ComponentActivity
+    val viewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
+    val productsResource by viewModel.products.observeAsState(
+        initial = Resource.loading(null)  //set loading state as initial -> display loader
+    )
     val state = productsResource ?: Resource.loading(null)
+
+
+    BackHandler(enabled = true) {
+        if(backPressed){
+            activity.finish()
+        }
+        else{
+            backPressed = true
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_LONG).show()
+        }
+    }
 
     when (productsResource?.status) {
         Status.LOADING -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+                CircularProgressIndicator() }
         }
         Status.SUCCESS -> {
             val data = state.data?.products
             DisplayHome(data, navController)
-
         }
         Status.ERROR -> {
             // Show the error message
             Text(
                 text = "Failed to load products: ${state.message}",
                 color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
+                modifier = Modifier.padding(16.dp))
         }
-
         else -> {}
     }
-
-
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -105,59 +132,120 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
 
     val images = ArrayList<String>()
     if (data != null) {
-        for(d in data) images.add(d.images[0])
+        for (d in data) if (images.size < 5) images.add(d.images[0])
     }
     val scrollState = rememberScrollState()
     val pageCount = images.size
     val pagerState = rememberPagerState(initialPage = 0) { pageCount }
     LaunchedEffect(pagerState) {
         while (true) {
-            delay(1500) // Delay for 3 seconds
+            delay(2000) // Delay for 3 seconds
             val nextPage = (pagerState.currentPage + 1) % pageCount
             pagerState.animateScrollToPage(nextPage)
         }
     }
 
+
     Scaffold(
-        topBar = { TopAppBar("Home", false, navController = navController) },
         containerColor = Color.White,
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).padding( horizontal = 16.dp)
-            .verticalScroll(scrollState)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null  //set click ripple to null
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null  //set click ripple to null
+                ) {
+                    navController.navigate(Screens.ProductsList)
+                }) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(10.dp)
             ) {
-                navController.navigate("product_screen")
-            }) {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(15.dp),) {
-                items(5) {topItem->
+                Text("Home", style = BOLD_STYLE, fontSize = 20.sp)
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = {
+                    navController.navigate(Screens.Search)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search, // Standard back arrow icon
+                        contentDescription = "Go back",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+                IconButton(onClick = {
+                    navController.navigate(Screens.ReposList)
+                }) {
+                    Image(
+                        painter = painterResource(R.drawable.outline_event_list_24), // Standard back arrow icon
+                        contentDescription = "Go back",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(15.dp)) {
+                items(5) { topItem ->
                     Column(modifier = Modifier.width(105.dp)) {
-                        CustomGlideImage(data?.get(topItem)?.images[0].toString(), 100.dp, 3.dp, 4.dp , CircleShape)
-                        Text(text = data?.get(topItem)?.title?:"", style = BOLD_STYLE ,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp).fillMaxWidth(),
+                        CustomGlideImage(
+                            data?.get(topItem)?.images[0].toString(),
+                            90.dp,
+                            3.dp,
+                            4.dp,
+                            CircleShape
+                        )
+                        Text(
+                            text = data?.get(topItem)?.title ?: "", style = BOLD_STYLE,
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                .fillMaxWidth(),
                             textAlign = TextAlign.Center,
-                            maxLines = 1, fontSize = 14.sp)
+                            maxLines = 1, fontSize = 14.sp
+                        )
                     }
                 }
             }
             Spacer(Modifier.height(15.dp))
             Text(text = "Today's Deals & Offers", style = BOLD_STYLE, fontSize = 18.sp)
-            HorizontalPager(
-                state = pagerState,
+
+            Box(
                 modifier = Modifier
+                    .height(230.dp)
+                    .padding(vertical = 10.dp, horizontal = 6.dp)
                     .fillMaxWidth()
-                    .height(220.dp)
-                    .padding(vertical = 10.dp)// Set a fixed height for the banner
-            ) { page ->
-                RounderRecGlideImage(images[page])
+                    .shadow(
+                        elevation = 4.dp, // Use a noticeable elevation for testing
+                        shape = RoundedCornerShape(15.dp)
+                    )
+                    .background(Color.White, shape = RoundedCornerShape(15.dp))
+                    .clip(RoundedCornerShape(15.dp))
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(190.dp),
+                ) { page ->
+                    RounderRecGlideImage(images[page])
+                }
+                HorizontalPagerIndicator(
+                    pageCount = images.size,
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 10.dp)
+                )
             }
+
             Spacer(Modifier.height(15.dp))
             Text(text = "Most Demanded Products", style = BOLD_STYLE, fontSize = 18.sp)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(15.dp),
-                modifier = Modifier.padding(12.dp)) {
-                items(data?.size?:0) {topItem->
-                    data?.get(topItem)?.let { GridItemCard(it , navController, 220.dp) }
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                modifier = Modifier.padding(6.dp)
+            ) {
+                items(data?.size ?: 0) { topItem ->
+                    data?.get(topItem)?.let { GridItemCard(it, navController, 220.dp) }
                 }
             }
             Spacer(Modifier.height(15.dp))
@@ -169,26 +257,32 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                     .height(200.dp)
                     .fillMaxWidth(),
                 // 3. Add padding around the entire grid content
-                contentPadding = PaddingValues(12.dp),
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
 
                 // 4. Set the spacing between rows and columns
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 // 5. Populate the grid using the items extension function
-                items(data?.size?:0) { item ->
-                    Log.d("kejfhgfwfew", "ProductScreen: ${data?.size?:0}")
-                    data?.get(item)?.let { CustomGlideImage(it?.images[0].toString(), 100.dp, 3.dp, 4.dp , CircleShape)
+                items(data?.size ?: 0) { item ->
+                    Log.d("kejfhgfwfew", "ProductScreen: ${data?.size ?: 0}")
+                    data?.get(item)?.let {
+                        CustomGlideImage(it?.images[0].toString(), 100.dp, 3.dp, 4.dp, CircleShape)
                     }
                 }
             }
             Spacer(Modifier.height(15.dp))
             Text(text = "Best Selling", style = BOLD_STYLE, fontSize = 18.sp)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(15.dp),
-                modifier = Modifier.padding(12.dp)) {
-                items(data?.size?:0) {topItem->
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 6.dp)
+            ) {
+
+                val newList = data?.filter { it.brand != null }
+                items(newList?.size ?: 0) { topItem ->
                     data?.get(topItem)?.let {
-                        GridHorizontalItemCard(it , navController, 300.dp) }
+                        GridHorizontalItemCard(it, navController, 300.dp)
+                    }
                 }
             }
         }
@@ -197,47 +291,147 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GridHorizontalItemCard(item: Product, navController: NavHostController, width : Dp) {
+fun GridHorizontalItemCard(item: Product, navController: NavHostController, width: Dp, showFull : Boolean = false) {
+    var isFavorite by remember { mutableStateOf(item.isFav) }
     ElevatedCard(
-        modifier = Modifier
+        modifier = if(width>0.dp){
+            Modifier
                 .padding(vertical = 10.dp, horizontal = 5.dp)
-                .width(width),
+                .width(width) }else
+        {
+            Modifier
+                .padding(vertical = 10.dp, horizontal = 5.dp)
+                .fillMaxWidth()
+        },
         colors = CardDefaults.elevatedCardColors(
             containerColor = Color.White
-        )  , onClick = {
-            //send response object
-            val jsonString = Gson().toJson(item)
-            val encodedJson = URLEncoder.encode(jsonString, StandardCharsets.UTF_8.name())
-            navController.navigate("product_detail_screen/$encodedJson")
+        ), onClick = {
+            navController.navigate("product_detail_screen/${item.id.toString()}")
         },
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 5.dp
-        ))  {
-        Row (modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        )
+    ) {
+        Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
                 model = item.images[0],
                 contentDescription = "Product image",
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp),)
+                    .width(110.dp)
+                    .height(110.dp),
+            )
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.brand?:"",
-                    style = BOLD_STYLE,
-                    color = Color.Black,
-                    maxLines = 1,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 5.dp)
-                )
-              Spacer(Modifier.height(10.dp))
+                if (showFull){
+                    Text(
+                        text = item.title ?: "",
+                        style = BOLD_STYLE,
+                        color = Color.Black,
+                        maxLines = 1,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 5.dp)
+                    )
+                    Text(
+                        text = item.brand ?: "",
+                        style = NORMAL_STYLE,
+                        color = Color.Gray,
+                        maxLines = 1,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 5.dp)
+                    )
+
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(BOLD_STYLE.toSpanStyle()){
+                                append("Price: ")
+                            }
+                            withStyle(NORMAL_STYLE.toSpanStyle()){
+                                append("$"+item.price.toString())
+                            }
+                        }, fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 5.dp))
+                }
+                else{
+                    Text(
+                        text = item.brand ?: "",
+                        style = BOLD_STYLE,
+                        color = Color.Black,
+                        maxLines = 1,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 5.dp),
+                    )
+                }
+                Spacer(Modifier.height(5.dp))
                 Text(
                     //error
-                    text = "⭐ ${item.rating.toString()}",
+                    text = "⭐ ${String.format("%.1f", item.rating)}",
                     style = NORMAL_STYLE,
                     fontSize = 14.sp
                 )
             }
+            if (showFull){
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = "Fav icon",
+                    modifier = Modifier
+                        .clickable {
+                            isFavorite = !isFavorite
+                            item.isFav = !(item.isFav)
+                        }
+                        .padding(end = 5.dp))
+            }
         }
     }
 }
+
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+
+    NavigationBar(
+
+        // set background color
+        containerColor = Color.White) {
+
+        // observe the backstack
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+        // observe current route to change the icon
+        // color,label color when navigated
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        // Bottom nav items we declared
+        Constants.BottomNavItems.forEach { navItem ->
+
+            // Place the bottom nav items
+            NavigationBarItem(
+
+                // it currentRoute is equal then its selected route
+                selected = currentRoute == navItem.destination,
+
+                // navigate on click
+                onClick = {
+                    navController.navigate(navItem.destination)
+                },
+
+                // Icon of navItem
+                icon = {
+                    Icon(imageVector = navItem.tabIcon, contentDescription = navItem.tabName, modifier = Modifier.size(30.dp))
+                },
+
+                // label
+                label = {
+                    Text(text = navItem.tabName, style = SMALL_BOLD_STYLE)
+                },
+                alwaysShowLabel = false,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.Black, // Icon color when selected
+                    unselectedIconColor = Color.Gray, // Icon color when not selected
+                    selectedTextColor = Color.Black, // Label color when selected
+                    indicatorColor = Color.White // Highlight color for selected item
+                ),
+            )
+        }
+    }
+}
+
 

@@ -1,9 +1,10 @@
 package com.example.demopaginationapp.view.screens
 
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,9 +19,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -28,22 +28,20 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,19 +54,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.dataclasses.Review
+import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.RounderRecGlideImage
 import com.example.demopaginationapp.utils.TopAppBar
 import com.example.demopaginationapp.viewmodel.ProductViewModel
-import com.google.gson.Gson
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import kotlinx.coroutines.delay
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -76,34 +72,20 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
     val context = LocalContext.current
     val activity = context as ComponentActivity
     val productViewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
-    val decodedJsonString = remember(data) {
-        if (data != null) {
-            // Apply URLDecoder to convert '+' back to space ' '
-            URLDecoder.decode(data, StandardCharsets.UTF_8.name())
-        } else {
-            null
-        }
-    }
-    val responseData: Product = remember(decodedJsonString) {
-        (if (decodedJsonString != null) {
-            try {
-                Gson().fromJson(decodedJsonString, Product::class.java)
-            } catch (e: Exception) {
-                Toast.makeText((context), "Exception caused is ${e.message}", Toast.LENGTH_LONG)
-                    .show()
-                Log.d("hhhh", "DetailScreen: exeption caused is ${e.message} ")
-            }
 
-        } else
-            null) as Product
-    }
+    var responseData: Product? = null
+    for (p in productViewModel.products.value?.data?.products!!)
+        if (p.id == data?.toInt())
+            responseData = p
+
+
 
     Scaffold(
         containerColor = Color.White,
         topBar = {
             TopAppBar("Details", true, navController)
         }) { paddingValues ->
-        ShowDetails(responseData, paddingValues, navController, productViewModel)
+        responseData?.let { ShowDetails(it, paddingValues, navController, productViewModel) }
     }
 
 }
@@ -124,7 +106,7 @@ fun ShowDetails(
     LaunchedEffect(pagerState) {
         // Coroutine loop for auto-scrolling
         while (true) {
-            delay(1500) // Delay for 3 seconds
+            delay(2000) // Delay for 3 seconds
             val nextPage = (pagerState.currentPage + 1) % pageCount
             pagerState.animateScrollToPage(nextPage)
         }
@@ -138,13 +120,37 @@ fun ShowDetails(
             .verticalScroll(scrollState)
     ) {
         Spacer(Modifier.height(5.dp))
-        HorizontalPager(
-            state = pagerState,
+        Box(
             modifier = Modifier
+                .height(230.dp)
+                .padding(vertical = 10.dp, horizontal = 6.dp)
                 .fillMaxWidth()
-                .height(220.dp) // Set a fixed height for the banner
-        ) { page ->
-            RounderRecGlideImage(responseData.images[page])
+                .shadow(
+                    elevation = 4.dp, // Use a noticeable elevation for testing
+                    shape = RoundedCornerShape(15.dp)
+                )
+                .background(Color.White, shape = RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp))
+        )
+        {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(190.dp) // Set a fixed height for the banner
+            ) { page ->
+                RounderRecGlideImage(responseData.images[page])
+            }
+            if (responseData.images.size > 1) {
+                HorizontalPagerIndicator(
+                    pageCount = responseData.images.size,
+                    pagerState = pagerState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 10.dp)
+                )
+            }
+
         }
         Spacer(Modifier.height(20.dp))
         Text(
@@ -243,9 +249,8 @@ fun ShowDetails(
             onClick = {
                 if (!addedToCart)
                     productViewModel.cartProducts.add(responseData)
-                Log.d("ererhhre", "CartScreen:  aaddedd ${productViewModel.cartProducts}")
                 if (addedToCart)
-                    navController.navigate("cart_screen")
+                    navController.navigate(Screens.Cart)
             }, modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.CenterHorizontally)
@@ -272,7 +277,7 @@ fun ShowDetails(
         }
         ElevatedButton(
             onClick = {
-                navController.navigate("product_screen")
+                navController.navigate(Screens.ProductsList)
             },
             modifier = Modifier
                 .fillMaxWidth()

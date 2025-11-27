@@ -9,11 +9,15 @@ import retrofit2.http.Query
 
 interface RetrofitInterface {
 
+    //pagination listing api
     @GET(Constants.LISTING)
     suspend fun getList(
         @Query("page") page : Int,
         @Query("per_page") perPage : Int,
     ): ResponseData
+
+
+    //dummy products list api
     @GET(Constants.PRODUCTS_LIST)
     suspend fun getProducts(
     ): ProductResponseData

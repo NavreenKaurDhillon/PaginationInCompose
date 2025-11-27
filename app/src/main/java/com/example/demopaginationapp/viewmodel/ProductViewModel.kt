@@ -11,11 +11,13 @@ import com.example.demopaginationapp.di.ProductApi
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.dataclasses.ProductResponseData
 import com.example.demopaginationapp.model.networking.Resource
+import com.example.demopaginationapp.model.networking.Status
 import com.example.demopaginationapp.model.repositories.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.map
 import kotlin.math.min
 
 @HiltViewModel
@@ -26,26 +28,12 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
     private var baseProducts = MutableLiveData<Resource<ProductResponseData>>()
     var products: LiveData<Resource<ProductResponseData>> = rawProducts
 
-    /*  rawProducts: LiveData<Resource<ProductResponseData>> = liveData(Dispatchers.IO) {
-          emit(Resource.loading(null, true))
-          val response = appRepository.getProducts()
-          emit(response)
-      }*/
-
 
     init {
         getProducts()
     }
 
-    fun getProductById(productId : Int): Product? {
-        baseProducts.value?.data?.products?.forEach { product ->
-            Log.d("ekkhejfkjewjfk", "Available Product ID: ${product.id}")
-        }
-       return if( productId!=0)
-           products.value?.data?.products?.find { it.id== productId }
-        else
-            null
-    }
+
     private fun getProducts() {
         viewModelScope.launch(Dispatchers.IO) {
 //            emit(Resource.loading(null, true))

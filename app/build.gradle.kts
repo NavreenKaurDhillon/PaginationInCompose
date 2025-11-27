@@ -99,4 +99,6 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    //dot indicator
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
 }

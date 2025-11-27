@@ -44,7 +44,7 @@ open class ResponseHandler @Inject constructor() {
     private fun getErrorMsg(responseBody: ResponseBody): BaseError {
         return try {
             val jsonObject = JSONObject(responseBody.string())
-            BaseError(400, jsonObject.getString("message"))
+            BaseError(400, jsonObject.getString("message")) //json parced to base error
         } catch (e: Exception) {
             BaseError(400, e.message!!)
         }

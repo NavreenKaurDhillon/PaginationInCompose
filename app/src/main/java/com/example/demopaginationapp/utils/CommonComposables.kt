@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,11 +33,13 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
+import com.example.demopaginationapp.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController) {
+fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController,  topSearchRightIcon : Boolean = false,  isHomeScreen : Boolean = false) {
   return  TopAppBar(
+      modifier = Modifier.padding(horizontal = 8.dp),
         title = { Text(name, style = BOLD_STYLE, fontSize = 20.sp) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White
@@ -57,12 +60,23 @@ fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController
             }
         },
       actions = {
-          if(!showBackButton) {
+          if(isHomeScreen) {
               IconButton(onClick = {
-                  navController.navigate("list_screen")
+                  navController.navigate(Screens.ReposList)
               }) {
                   Image(
                      painter = painterResource(R.drawable.outline_event_list_24), // Standard back arrow icon
+                      contentDescription = "Go back",
+                      modifier = Modifier.size(30.dp)
+                  )
+              }
+          }
+          if (topSearchRightIcon){
+              IconButton(onClick = {
+                  navController.navigate(Screens.ProductsList)
+              }) {
+                  Icon(
+                      imageVector = Icons.Filled.Search, // Standard back arrow icon
                       contentDescription = "Go back",
                       modifier = Modifier.size(30.dp)
                   )
@@ -107,10 +121,6 @@ fun RounderRecGlideImage(
             Modifier
                 .fillMaxSize()
                 .padding( 8.dp)
-                .shadow(
-                    elevation = 4.dp, // Use a noticeable elevation for testing
-                    shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
-                .clip(RoundedCornerShape(15.dp))
         } else {
             Modifier
                 .height(sizeDp)

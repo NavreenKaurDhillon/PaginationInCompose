@@ -1,95 +1,49 @@
 package com.example.demopaginationapp.view.activities
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.demopaginationapp.view.screens.CartScreen
-import com.example.demopaginationapp.view.screens.CouponScreen
-import com.example.demopaginationapp.view.screens.DetailScreen
-import com.example.demopaginationapp.view.screens.HomeScreen
-import com.example.demopaginationapp.view.screens.ListScreen
-import com.example.demopaginationapp.view.screens.ProductDetailScreen
-import com.example.demopaginationapp.view.screens.ProductScreen
+import com.example.demopaginationapp.navigation.AppNavHostSetup
+import com.example.demopaginationapp.navigation.Screens
+import com.example.demopaginationapp.view.screens.BottomNavigationBar
 import com.example.demopaginationapp.view.theme.DemoPaginationAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint  //annotation required for composables to be able to get viewmodel dependency using hiltViewModel()
 class MainActivity : ComponentActivity() {
+    val bottomBarRoutes =
+        listOf(Screens.Home, Screens.ProductsList, Screens.Favorites, Screens.Cart)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DemoPaginationAppTheme {
-                    AppNavHostSetup()
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+                Scaffold(
+                    // Bottom navigation
+                    bottomBar = {
+                        if (currentRoute in bottomBarRoutes)
+                            BottomNavigationBar(navController = navController)
+                    }, content = { padding ->
+                        // Nav host: where screens are placed
+                        AppNavHostSetup(navController = navController, padding = padding)
+                    }
+                )
             }
         }
-    }
-
-
-    @Composable
-    fun AppNavHostSetup() {
-        val navController = rememberNavController()
-        NavHost(
-            navController = navController,
-            startDestination = "home_screen"  //set the start destination - the first visible default fragment
-        ) {
-            composable("list_screen") { //used as key for navigation
-                ListScreen(navController)       //navigate to class
-            }
-            composable("home_screen") { //used as key for navigation
-                HomeScreen(navController)       //navigate to class
-            }
-            composable("product_screen") { //used as key for navigation
-                ProductScreen(navController)       //navigate to class
-            }
-            composable("coupon_screen") { //used as key for navigation
-                CouponScreen(navController)       //navigate to class
-            }
-            composable("cart_screen") { //used as key for navigation
-                CartScreen(navController)       //navigate to class
-            }
-            composable(
-                route = "detail_screen/{data}", // Define the argument name
-                arguments = listOf(navArgument("data") {
-                    type = NavType.StringType           // Define the type
-                })
-            ) { backStackEntry ->
-                val data = backStackEntry.arguments?.getString("data")
-                Log.d("jfbjbfwehjbefw", "AppNavHostSetup: $data")
-                DetailScreen(data = data, navController) // Pass the data to the DetailScreen and convert there
-
-            }
-            composable(
-                route = "product_detail_screen/{data}", // Define the argument name
-                arguments = listOf(navArgument("data") {
-                    type = NavType.StringType           // Define the type
-                })
-            ) { backStackEntry ->
-                val data = backStackEntry.arguments?.getString("data")
-                Log.d("jfbjbfwehjbefw", "AppNavHostSetup: $data")
-                ProductDetailScreen(data = data, navController) // Pass the data to the DetailScreen and convert there
-
-            }
-        }
-    }
-
-
-    @Composable
-    fun TabNavigation(){
-        val navController = rememberNavController()
-//        val startDestination = Destination.SONGS
-//        var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
-
-
-
     }
 }
+
+
+
+
+
 

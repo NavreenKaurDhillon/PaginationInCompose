@@ -42,6 +42,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
+import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.RounderRecGlideImage
@@ -199,7 +200,7 @@ fun ShowRepoDetail(
 
         Spacer(Modifier.height(30.dp))
         Button(onClick = {
-            navController.navigate("home_screen")
+            navController.navigate(Screens.Home)
         },
             modifier = Modifier.padding(20.dp),
             colors = ButtonDefaults.buttonColors(

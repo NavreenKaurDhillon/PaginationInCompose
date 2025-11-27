@@ -22,7 +22,7 @@ object Constants {
         BottomNavItem(
             tabName = "Products",
             tabIcon = Icons.Filled.List,
-            destination = Screens.ProductsList
+            destination = Screens.Brands
         ),
         // Profile screen
         BottomNavItem(

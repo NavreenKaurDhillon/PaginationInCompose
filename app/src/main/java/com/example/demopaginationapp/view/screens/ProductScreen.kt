@@ -86,7 +86,11 @@ import java.nio.charset.StandardCharsets
 fun ProductScreen(navController: NavHostController) {
     val context = LocalContext.current
     val activity = context as ComponentActivity
-    val viewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
+    val viewModel: ProductViewModel = hiltViewModel()
+    val productsResource by viewModel.products.observeAsState(
+        initial = Resource.loading(null)  //set loading state as initial -> display loader
+    )
+    val state = productsResource ?: Resource.loading(null)
 
     BackHandler(enabled = true) {
         //Handle the back press manually -> navigate to home
@@ -104,15 +108,15 @@ fun ProductScreen(navController: NavHostController) {
             currentSortOption = "None", // Replace with state from ViewModel
             onDismiss = { showDialog = false },
             onSortSelected = { option ->
-                viewModel.setSortOption(option) // Implement this
+                viewModel.setSortOption(option)
                 showDialog = false
             },
             onFilterApplied = { brand, maxPrice ->
-                // viewModel.applyFilters(brand, maxPrice) // Implement this
+                // viewModel.applyFilters(brand, maxPrice)
                 showDialog = false
             },
             onFilterClear = {
-                // viewModel.clearFilters() // Implement this
+                // viewModel.clearFilters()
                 showDialog = false
             })
     }
@@ -120,7 +124,7 @@ fun ProductScreen(navController: NavHostController) {
         topBar = {
             com.example.demopaginationapp.utils.TopAppBar(
                 "Products List",
-                showBackButton = false,
+                showBackButton = true,
                 navController = navController
             )
         },
@@ -130,14 +134,32 @@ fun ProductScreen(navController: NavHostController) {
         },
         containerColor = Color.White,
     ) { paddingValues ->
-        viewModel.products.value?.data?.products?.let {
-            ShowProductsList(
-                paddingValues,
-                it,
-                navController
-            )
+        when (productsResource?.status) {
+            Status.LOADING -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator() }
+            }
+            Status.SUCCESS -> {
+                val data = state.data?.products
+                data?.let {
+                    ShowProductsList(
+                        paddingValues,
+                        it,
+                        navController
+                    )
+                }
+            }
+            Status.ERROR -> {
+                // Show the error message
+                Text(
+                    text = "Failed to load products: ${state.message}",
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp))
+            }
+            else -> {}
         }
     }
+
 }
 
 
@@ -260,7 +282,8 @@ fun SortFilterBottomBar(
         modifier = Modifier
             .fillMaxWidth(),
         containerColor = Color.White,
-        tonalElevation = 8.dp
+        tonalElevation = 8.dp,
+
     ) {
         Row(
             modifier = Modifier

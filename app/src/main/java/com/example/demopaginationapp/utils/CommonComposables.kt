@@ -98,14 +98,26 @@ fun CustomGlideImage(
     return  GlideImage(
         model = image,
         contentDescription = "img",
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(paddingDp)
-            .shadow(
-                elevation = elevationDp, // Use a noticeable elevation for testing
-                shape = imageShape)
-            .background(Color.White, shape = imageShape)
-            .clip(imageShape),
+        modifier = if (sizeDp>0.dp){
+            Modifier
+                .size(sizeDp)
+                .padding(paddingDp)
+                .shadow(
+                    elevation = elevationDp, // Use a noticeable elevation for testing
+                    shape = imageShape)
+                .background(Color.White, shape = imageShape)
+                .clip(imageShape)
+        }
+        else{
+            Modifier
+                .fillMaxWidth()
+                .padding(paddingDp)
+                .shadow(
+                    elevation = elevationDp, // Use a noticeable elevation for testing
+                    shape = imageShape)
+                .background(Color.White, shape = imageShape)
+                .clip(imageShape)
+        },
     )
 }
 @OptIn(ExperimentalGlideComposeApi::class)

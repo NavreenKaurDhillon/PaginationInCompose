@@ -10,4 +10,8 @@ object Screens {
     const val Coupons = "coupon_screen"
     const val RepoDetail = "detail_screen"
     const val ProductDetail = "product_detail_screen"
+    const val Brands = "brand_screen"
 }
+
+val bottomBarRoutes =
+    listOf(Screens.Home, Screens.Brands, Screens.Favorites, Screens.Cart)

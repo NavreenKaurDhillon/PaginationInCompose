@@ -1,15 +1,19 @@
 package com.example.demopaginationapp.navigation
 
-import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.demopaginationapp.view.screens.BrandScreen
 import com.example.demopaginationapp.view.screens.CartScreen
 import com.example.demopaginationapp.view.screens.CouponScreen
 import com.example.demopaginationapp.view.screens.DetailScreen
@@ -22,13 +26,22 @@ import com.example.demopaginationapp.view.screens.SearchScreen
 
 @Composable
 fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     NavHost(
-//        modifier = Modifier.padding(padding),
+        modifier = if (currentRoute in bottomBarRoutes)
+            Modifier.background(color = Color.White).padding(padding)
+        else
+            Modifier.background(color = Color.White)
+        ,
         navController = navController,
         startDestination = Screens.Home  //set the start destination - the first visible default fragment
     ) {
         composable(Screens.ReposList) { //used as key for navigation
             ListScreen(navController)       //navigate to class
+        }
+        composable(Screens.Brands) { //used as key for navigation
+            BrandScreen(navController)       //navigate to class
         }
         composable(Screens.Search) { //used as key for navigation
             SearchScreen(navController)       //navigate to class

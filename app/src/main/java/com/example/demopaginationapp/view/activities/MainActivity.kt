@@ -10,14 +10,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.demopaginationapp.navigation.AppNavHostSetup
 import com.example.demopaginationapp.navigation.Screens
+import com.example.demopaginationapp.navigation.bottomBarRoutes
 import com.example.demopaginationapp.view.screens.BottomNavigationBar
 import com.example.demopaginationapp.view.theme.DemoPaginationAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint  //annotation required for composables to be able to get viewmodel dependency using hiltViewModel()
 class MainActivity : ComponentActivity() {
-    val bottomBarRoutes =
-        listOf(Screens.Home, Screens.ProductsList, Screens.Favorites, Screens.Cart)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +33,11 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         if (currentRoute in bottomBarRoutes)
                             BottomNavigationBar(navController = navController)
-                    }, content = { padding ->
-                        // Nav host: where screens are placed
-                        AppNavHostSetup(navController = navController, padding = padding)
-                    }
-                )
+                    },
+                ){ paddingValues ->
+                    // Nav host: where screens are placed
+                    AppNavHostSetup(navController = navController, padding = paddingValues)
+                }
             }
         }
     }

@@ -70,11 +70,11 @@ fun FavScreen(navController: NavHostController) {
             launchSingleTop = true
         }
     }
-    Scaffold(topBar = { TopAppBar("Favorites", false, navController) }, containerColor = Color.White) { paddingValues ->
+    Column(modifier = Modifier.padding(horizontal = 15.dp)) {
+        Text(text = "Favorites", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.padding( 10.dp).fillMaxWidth(), textAlign = TextAlign.Center)
         if (favoritesList.size>0) {
             LazyColumn(
                 modifier = Modifier
-                    .padding(paddingValues)
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(12.dp),
             ) {
@@ -137,7 +137,7 @@ fun FavItemCard(item: Product, navController: NavHostController, width: Dp, show
                         fontSize = 16.sp,
                         modifier = Modifier.padding(top = 5.dp))
                     Text(
-                        text = item.brand ?: "",
+                        text = item.brand ?: "Dummy",
                         style = NORMAL_STYLE,
                         color = Color.Gray,
                         maxLines = 1,

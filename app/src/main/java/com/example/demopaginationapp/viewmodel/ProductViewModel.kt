@@ -45,44 +45,28 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
     }
 
     fun setSortOption(option: String) {
-        when(option){
-            "Price Low to High" -> {
-                val newProducts = rawProducts.value?.data?.products?.sortedBy { it.price }
-                rawProducts.postValue(Resource.success(newProducts?.let {
-                    ProductResponseData(
-                        products = it,
-                        limit = products.value?.data?.limit?.toInt(),
-                        skip = products.value?.data?.skip,
-                        total = products.value?.data?.total
-                    )
-                }))
-            }
-            "Price High to Low" -> {
-                val newProducts = rawProducts.value?.data?.products?.sortedByDescending { it.price }
-                rawProducts.postValue(Resource.success(newProducts?.let {
-                    ProductResponseData(
-                        products = it,
-                        limit = products.value?.data?.limit?.toInt(),
-                        skip = products.value?.data?.skip,
-                        total = products.value?.data?.total
-                    )
-                }))
-            }
-            "Rating High to Low" ->{
-                val newProducts = rawProducts.value?.data?.products?.sortedByDescending { it.rating }
-                rawProducts.postValue(Resource.success(newProducts?.let {
-                    ProductResponseData(
-                        products = it,
-                        limit = products.value?.data?.limit?.toInt(),
-                        skip = products.value?.data?.skip,
-                        total = products.value?.data?.total
-                    )
-                }))
-            }
-            else -> {
-                rawProducts = baseProducts
-            }
+        // 1. Get the original data from the base LiveData
+        val baseData = baseProducts.value?.data?.products
+
+        val sortedProducts: List<Product>? = when (option) {
+            "Price Low to High" -> baseData?.sortedBy { it.price }?.toList()
+            "Price High to Low" -> baseData?.sortedByDescending { it.price }
+            "Rating High to Low" -> baseData?.sortedByDescending { it.rating }
+            else -> baseData
         }
+        //Post a NEW Resource.success()
+        rawProducts.postValue(
+            Resource.success(
+                sortedProducts?.let {
+                    ProductResponseData(
+                        products = it,
+                        limit = baseProducts.value?.data?.limit?.toInt(),
+                        skip = baseProducts.value?.data?.skip,
+                        total = baseProducts.value?.data?.total
+                    )
+                }
+            )
+        )
     }
 
     fun applyFilter(minPriceValue : Int, maxPriceValue : Int){

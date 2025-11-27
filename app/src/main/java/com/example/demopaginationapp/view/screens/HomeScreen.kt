@@ -53,7 +53,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -146,12 +149,8 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
     }
 
 
-    Scaffold(
-        containerColor = Color.White,
-    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState)
                 .clickable(
@@ -190,7 +189,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                     Column(modifier = Modifier.width(105.dp)) {
                         CustomGlideImage(
                             data?.get(topItem)?.images[0].toString(),
-                            90.dp,
+                            0.dp,
                             3.dp,
                             4.dp,
                             CircleShape
@@ -251,15 +250,12 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
             Spacer(Modifier.height(15.dp))
             Text(text = "Top Brands", style = BOLD_STYLE, fontSize = 18.sp)
             LazyHorizontalGrid(
-                // 2. Define the columns: GridCells.Fixed(2) creates exactly two columns
+                // Define the columns: GridCells.Fixed(2) creates exactly two columns
                 rows = GridCells.Fixed(2),
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth(),
-                // 3. Add padding around the entire grid content
                 contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
-
-                // 4. Set the spacing between rows and columns
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -286,7 +282,6 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 }
             }
         }
-    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -331,7 +326,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
                         modifier = Modifier.padding(top = 5.dp)
                     )
                     Text(
-                        text = item.brand ?: "",
+                        text = item.brand ?: "Dummy",
                         style = NORMAL_STYLE,
                         color = Color.Gray,
                         maxLines = 1,
@@ -388,36 +383,35 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
 fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar(
-
         // set background color
-        containerColor = Color.White) {
-
+        containerColor = Color.White,
+        modifier = Modifier.drawBehind {
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Transparent, Color.Black),
+                startY = -30f,
+                endY = size.height
+            ),
+            topLeft = Offset(0f, -30f)
+        )
+    },) {
         // observe the backstack
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-        // observe current route to change the icon
-        // color,label color when navigated
         val currentRoute = navBackStackEntry?.destination?.route
-
         // Bottom nav items we declared
         Constants.BottomNavItems.forEach { navItem ->
-
             // Place the bottom nav items
             NavigationBarItem(
-
                 // it currentRoute is equal then its selected route
                 selected = currentRoute == navItem.destination,
-
                 // navigate on click
                 onClick = {
                     navController.navigate(navItem.destination)
                 },
-
                 // Icon of navItem
                 icon = {
                     Icon(imageVector = navItem.tabIcon, contentDescription = navItem.tabName, modifier = Modifier.size(30.dp))
                 },
-
                 // label
                 label = {
                     Text(text = navItem.tabName, style = SMALL_BOLD_STYLE)

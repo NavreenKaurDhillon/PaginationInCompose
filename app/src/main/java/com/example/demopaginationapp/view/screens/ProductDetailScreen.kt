@@ -2,7 +2,10 @@ package com.example.demopaginationapp.view.screens
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
@@ -35,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -210,56 +215,53 @@ fun ShowDetails(
             maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3,  //max 3 lines for description
             overflow = TextOverflow.Ellipsis //show ... if text is more than 3 lines
         )
-        TextButton(
-            onClick = {
+        TextButton(onClick = {
                 descriptionExpanded = !descriptionExpanded
-            },
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            }
             ) {
-                Icon(
-                    painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
-                        R.drawable.baseline_keyboard_arrow_down_24
-                    ),
-                    tint = Color.Blue,
-                    contentDescription = "expand text",
-                    modifier = Modifier
-                        .size(25.dp)
-                        .padding(end = 5.dp)
-                )
-                Text(
-                    text = if (descriptionExpanded) "Show Less" else "Show More",
-                    fontSize = 14.sp,
-                    style = NORMAL_STYLE,
-                    color = Color.Blue,
-                    textDecoration = TextDecoration.Underline
-                )
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
+                            R.drawable.baseline_keyboard_arrow_down_24
+                        ),
+                        tint = Color.Blue,
+                        contentDescription = "expand text",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .padding(end = 5.dp)
+                    )
+                    Text(
+                        text = if (descriptionExpanded) "Show Less" else "Show More",
+                        fontSize = 14.sp,
+                        style = NORMAL_STYLE,
+                        color = Color.Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
+                }
             }
-        }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(responseData?.reviews?.size ?: 0) { topItem ->
-                responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
+                    LazyRow (horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(responseData?.reviews?.size ?: 0) { topItem ->
+                    responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
+                }
             }
-        }
-        Spacer(Modifier.height(20.dp))
-        Button(
-            onClick = {
-                if (!addedToCart)
-                    productViewModel.cartProducts.add(responseData)
-                if (addedToCart)
-                    navController.navigate(Screens.Cart)
-            }, modifier = Modifier
+                    Spacer (Modifier.height(20.dp))
+                    Button (
+                    onClick = {
+                        if (!addedToCart)
+                            productViewModel.cartProducts.add(responseData)
+                        if (addedToCart)
+                            navController.navigate(Screens.Cart)
+                    }, modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.CenterHorizontally)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
+                .fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black, // Sets the background color of the button
                 contentColor = Color.White    // Sets the color of the text/icon inside the button
-            )
-        ) {
+            )) {
             Icon(
                 painter = if (addedToCart) painterResource(R.drawable.cart_icon) else painterResource(
                     R.drawable.add_to_cart_icon

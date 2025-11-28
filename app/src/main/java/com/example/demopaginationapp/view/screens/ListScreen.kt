@@ -159,16 +159,11 @@ private fun ListItemCard(
     onItemClick: (String) -> Unit
 ) {
 
-    val uriHandler = LocalUriHandler.current
-    val url = responseDataItem.owner.organizations_url
 
     ElevatedCard(
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 5.dp)
             .fillMaxWidth(), onClick = {
-            //send single parameter
-//        navController.navigate("detail_screen/${responseDataItem.name}")
-
 
             //send response object
             val jsonString = Gson().toJson(responseDataItem)

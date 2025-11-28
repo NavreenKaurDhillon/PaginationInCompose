@@ -86,7 +86,7 @@ import java.nio.charset.StandardCharsets
 fun ProductScreen(navController: NavHostController) {
     val context = LocalContext.current
     val activity = context as ComponentActivity
-    val viewModel: ProductViewModel = hiltViewModel()
+    val viewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val productsResource by viewModel.products.observeAsState(
         initial = Resource.loading(null)  //set loading state as initial -> display loader
     )

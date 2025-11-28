@@ -26,8 +26,8 @@ import com.example.demopaginationapp.view.screens.SearchScreen
 
 @Composable
 fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val navBackStackEntry by navController.currentBackStackEntryAsState()  //observe back stack entry and cause recomposition when needed to update ui outside the nav base dn the current route
+    val currentRoute = navBackStackEntry?.destination?.route  //need current state to update scaffold padding
     NavHost(
         modifier = if (currentRoute in bottomBarRoutes)
             Modifier.background(color = Color.White).padding(padding)
@@ -77,7 +77,7 @@ fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
             })
         ) { backStackEntry ->
             val data = backStackEntry.arguments?.getString("data")
-            ProductDetailScreen(data = data, navController) // Pass the data DetailScreen
+            ProductDetailScreen(data = data, navController) // Pass the data to DetailScreen
 
         }
     }

@@ -1,6 +1,5 @@
 package com.example.demopaginationapp.view.screens
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,12 +19,9 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,9 +43,7 @@ import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
-import com.example.demopaginationapp.utils.TopAppBar
 import com.example.demopaginationapp.viewmodel.ProductViewModel
-
 
 
 @Composable
@@ -59,7 +52,9 @@ fun FavScreen(navController: NavHostController) {
     val activity = context as ComponentActivity
     val viewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val favoritesList = ArrayList<Product>()
-    viewModel.products.value?.data?.products?.forEach { if(it.isFav) favoritesList.add(it)  }
+    viewModel.products.value?.data?.products?.forEach {
+        if(it.isFav) favoritesList.add(it)
+    }
 
     BackHandler(enabled = true) {
         //Handle the back press manually -> navigate to home

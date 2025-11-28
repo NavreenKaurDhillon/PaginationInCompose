@@ -262,7 +262,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 items(data?.size ?: 0) { item ->
                     Log.d("kejfhgfwfew", "ProductScreen: ${data?.size ?: 0}")
                     data?.get(item)?.let {
-                        CustomGlideImage(it?.images[0].toString(), 100.dp, 3.dp, 4.dp, CircleShape)
+                        CustomGlideImage(it?.images[0].toString(), 0.dp, 3.dp, 4.dp, CircleShape)
                     }
                 }
             }

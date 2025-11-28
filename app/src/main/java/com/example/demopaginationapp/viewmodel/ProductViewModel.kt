@@ -45,7 +45,6 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
     }
 
     fun setSortOption(option: String) {
-        // 1. Get the original data from the base LiveData
         val baseData = baseProducts.value?.data?.products
 
         val sortedProducts: List<Product>? = when (option) {

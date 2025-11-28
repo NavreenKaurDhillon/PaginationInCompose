@@ -18,9 +18,9 @@ private const val STARTING_KEY = 1
 class MyPagingSource @Inject constructor(@GoogleBaseUrl private val appRepository: AppRepository) : PagingSource<Int, ResponseDataItem>() {
     override fun getRefreshKey(state: PagingState<Int, ResponseDataItem>): Int? {
         // calculates fresh key
-        val anchorPosition = state.anchorPosition ?: return null //anchorPosition-pos near to middle
+        val anchorPosition = state.anchorPosition ?: return null //anchorPosition-pos near to middle - > used to keep the user's current focus item in list instead of fully refreshing whole page
         val item = state.closestItemToPosition(anchorPosition) ?: return null
-        return ensureValidKey(key = item.id - (state.config.pageSize / 2))
+        return ensureValidKey(key = item.id - (state.config.pageSize / 2)) //return middle key (10 - 50/2) -> -15 ->1
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ResponseDataItem> {

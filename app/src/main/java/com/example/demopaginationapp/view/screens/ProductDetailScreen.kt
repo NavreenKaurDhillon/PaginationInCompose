@@ -215,9 +215,11 @@ fun ShowDetails(
             maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3,  //max 3 lines for description
             overflow = TextOverflow.Ellipsis //show ... if text is more than 3 lines
         )
+
         TextButton(onClick = {
                 descriptionExpanded = !descriptionExpanded
-            }
+            }, colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White, )
             ) {
                 Row(
                     horizontalArrangement = Arrangement.End,

@@ -9,17 +9,23 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,12 +72,12 @@ fun DetailScreen(data: String?, navController: NavController) {
             null) as ResponseDataItem
     }
 
-    Scaffold(containerColor = Color.White,
+/*    Scaffold(containerColor = Color.White,
         topBar = {
             TopAppBar("Details", true, navController)
-        }) { paddingValues ->
-        ShowRepoDetail(responseData, paddingValues, context, navController)
-    }
+        }) { paddingValues ->*/
+        ShowRepoDetail(responseData, context, navController)
+//    }
 
 }
 
@@ -79,136 +85,160 @@ fun DetailScreen(data: String?, navController: NavController) {
 @Composable
 fun ShowRepoDetail(
     responseData: ResponseDataItem,
-    paddingValues: PaddingValues,
     context: Context,
     navController: NavController
 ) {
     Column(modifier = Modifier
-        .padding(paddingValues)
         .fillMaxSize()
-        .padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
+        .padding(horizontal = 12.dp).verticalScroll(rememberScrollState()),
     ) {
         val url = responseData.owner.organizations_url
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = {
+                // go back to last screen
+                navController.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Go back",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            Text(text = "Details", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+        }
         Spacer(Modifier.height(5.dp))
         RounderRecGlideImage(responseData.owner.avatar_url, 200.dp)
         Spacer(Modifier.height(15.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("ID :")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.id.toString())
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Name :")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.name)
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
+        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
 
-        val annotatedString = buildAnnotatedString {
-            withStyle(BOLD_STYLE.toSpanStyle()) {
-                append("Organisational URL : ")
-            }
-            pushStringAnnotation(
-                tag = "Org_tag",
-                annotation = url
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("ID :")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.id.toString())
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
             )
-            withStyle(
-                style = NORMAL_STYLE.toSpanStyle().copy(
-                    color = Color.Blue,
-                    textDecoration = TextDecoration.Underline
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Name :")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.name)
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+
+            val annotatedString = buildAnnotatedString {
+                withStyle(BOLD_STYLE.toSpanStyle()) {
+                    append("Organisational URL : ")
+                }
+                pushStringAnnotation(
+                    tag = "Org_tag",
+                    annotation = url
+                )
+                withStyle(
+                    style = NORMAL_STYLE.toSpanStyle().copy(
+                        color = Color.Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
+                ) {
+                    append(url)
+                }
+                pop()
+            }
+
+
+            ClickableText(
+                text = annotatedString,
+                onClick = { offset ->
+                    annotatedString.getStringAnnotations(
+                        tag = "Org_tag",
+                        start = offset,
+                        end = offset
+                    ).firstOrNull()?.let { annotation ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                        context.startActivity(intent)
+                    }
+                },
+                modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Owner :")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.owner.id.toString())
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Description :")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(Constants.dummyDescription)
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Visibility :")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.visibility)
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Private:")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.private.toString())
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(BOLD_STYLE.toSpanStyle()) {
+                        append("Default branch:")
+                    }
+                    withStyle(NORMAL_STYLE.toSpanStyle()) {
+                        append(responseData.default_branch.toString())
+                    }
+                }, modifier = Modifier.padding(top = 5.dp)
+            )
+
+            Spacer(Modifier.height(30.dp))
+            Button(
+                onClick = {
+                    navController.navigate(Screens.Home)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White,
                 )
             ) {
-                append(url)
+                Text(
+                    text = "HOME",
+                    textAlign = TextAlign.Center,
+                    style = BOLD_STYLE,
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                    fontSize = 18.sp
+                )
+
             }
-            pop()
-        }
-
-
-        ClickableText(
-            text = annotatedString,
-            onClick = { offset ->
-                annotatedString.getStringAnnotations(
-                    tag = "Org_tag",
-                    start = offset,
-                    end = offset
-                ).firstOrNull()?.let { annotation ->
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                    context.startActivity(intent)
-                }
-            },
-             modifier = Modifier.padding(top = 5.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Owner :")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.owner.id.toString())
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Description :")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(Constants.dummyDescription)
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Visibility :")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.visibility)
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Private:")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.private.toString())
-                }
-            }, modifier = Modifier.padding(top = 5.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(BOLD_STYLE.toSpanStyle()){
-                    append("Default branch:")
-                }
-                withStyle(NORMAL_STYLE.toSpanStyle()){
-                    append(responseData.default_branch.toString())
-                }
-            }, modifier = Modifier.padding(top = 5.dp)
-        )
-
-        Spacer(Modifier.height(30.dp))
-        Button(onClick = {
-            navController.navigate(Screens.Home)
-        },
-            modifier = Modifier.padding(20.dp),
-            colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            contentColor = Color.White
-            ,
-        )) {
-            Text(text = "HOME",  textAlign = TextAlign.Center, style = BOLD_STYLE, color = Color.White, modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), fontSize = 18.sp)
-
         }
 
 

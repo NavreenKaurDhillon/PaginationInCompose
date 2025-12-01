@@ -5,7 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -45,7 +47,8 @@ fun BrandScreen(navController: NavHostController) {
     }
 
     Column(modifier = Modifier.padding(horizontal = 15.dp)) {
-       Text(text = "Shop By Brands", style = BOLD_STYLE, fontSize = 20.sp,  modifier = Modifier.padding( 10.dp).fillMaxWidth(), textAlign = TextAlign.Center)
+       Text(text = "Shop By Brands", style = BOLD_STYLE, fontSize = 20.sp,  modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        Spacer(Modifier.height(15.dp))
         viewModel.products.value?.data?.products?.let {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),

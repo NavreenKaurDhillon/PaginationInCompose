@@ -36,11 +36,9 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
 
     private fun getProducts() {
         viewModelScope.launch(Dispatchers.IO) {
-//            emit(Resource.loading(null, true))
             val response = appRepository.getProducts()
             rawProducts.postValue(response)
             baseProducts.postValue(response)
-//            emit(response)
         }
     }
 
@@ -68,11 +66,4 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
         )
     }
 
-    fun applyFilter(minPriceValue : Int, maxPriceValue : Int){
-     //filter the products between the user's selected price range
-          rawProducts.value?.data?.products?.map {
-              it.price > minPriceValue && it.price < maxPriceValue
-        }
-
-    }
 }

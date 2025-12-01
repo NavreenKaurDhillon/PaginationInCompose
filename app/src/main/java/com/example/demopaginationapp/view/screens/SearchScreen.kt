@@ -55,8 +55,8 @@ fun SearchScreen(navController: NavHostController) {
         }
     }
 
-    Scaffold(containerColor = Color.White) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+//    Scaffold(containerColor = Color.White) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize()) {
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it},
@@ -107,8 +107,8 @@ fun SearchScreen(navController: NavHostController) {
                 }
             }
             else{
-                filteredProducts?.let { ShowProductsList(PaddingValues(horizontal = 5.dp, vertical = 5.dp), it, navController, false) }
+                filteredProducts?.let { ShowProductsList(it, navController, false, Modifier.weight(1f)) }
             }
         }
-    }
+//    }
 }

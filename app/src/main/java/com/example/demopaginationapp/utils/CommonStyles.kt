@@ -13,6 +13,13 @@ val BOLD_STYLE = TextStyle(
     color = Color.Black
 
 )
+val SEMI_BOLD_STYLE = TextStyle(
+    fontWeight = FontWeight.SemiBold,
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 15.sp,
+    color = Color.Black
+
+)
 val SMALL_BOLD_STYLE = TextStyle(
     fontWeight = FontWeight.Bold,
     fontFamily = FontFamily.SansSerif,

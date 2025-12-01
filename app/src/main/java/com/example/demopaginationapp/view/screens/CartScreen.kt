@@ -68,11 +68,11 @@ fun CartScreen(navController: NavHostController) {
 
     Column(modifier = Modifier.padding(horizontal = 15.dp).fillMaxSize()) {
         Text(text = "My Cart", style = BOLD_STYLE, fontSize = 20.sp, modifier =  Modifier.padding( 10.dp).fillMaxWidth(), textAlign = TextAlign.Center)
+
         val scrollState = rememberScrollState()
             if (productViewModel.cartProducts.isNotEmpty()) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 15.dp)
                         .verticalScroll(scrollState)
                         .fillMaxSize()
                 ) {

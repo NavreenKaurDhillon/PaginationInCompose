@@ -24,6 +24,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -48,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -216,54 +220,57 @@ fun ShowDetails(
             overflow = TextOverflow.Ellipsis //show ... if text is more than 3 lines
         )
 
-        TextButton(onClick = {
+        TextButton(
+            onClick = {
                 descriptionExpanded = !descriptionExpanded
             }, colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White, )
+                containerColor = Color.White,
+            )
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
-                            R.drawable.baseline_keyboard_arrow_down_24
-                        ),
-                        tint = Color.Blue,
-                        contentDescription = "expand text",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .padding(end = 5.dp)
-                    )
-                    Text(
-                        text = if (descriptionExpanded) "Show Less" else "Show More",
-                        fontSize = 14.sp,
-                        style = NORMAL_STYLE,
-                        color = Color.Blue,
-                        textDecoration = TextDecoration.Underline
-                    )
-                }
+                Icon(
+                    painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
+                        R.drawable.baseline_keyboard_arrow_down_24
+                    ),
+                    tint = Color.Blue,
+                    contentDescription = "expand text",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .padding(end = 5.dp)
+                )
+                Text(
+                    text = if (descriptionExpanded) "Show Less" else "Show More",
+                    fontSize = 14.sp,
+                    style = NORMAL_STYLE,
+                    color = Color.Blue,
+                    textDecoration = TextDecoration.Underline
+                )
             }
-                    LazyRow (horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(responseData?.reviews?.size ?: 0) { topItem ->
-                    responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
-                }
+        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(responseData?.reviews?.size ?: 0) { topItem ->
+                responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
             }
-                    Spacer (Modifier.height(20.dp))
-                    Button (
-                    onClick = {
-                        if (!addedToCart)
-                            productViewModel.cartProducts.add(responseData)
-                        if (addedToCart)
-                            navController.navigate(Screens.Cart)
-                    }, modifier = Modifier
+        }
+        Spacer(Modifier.height(20.dp))
+        Button(
+            onClick = {
+                if (!addedToCart)
+                    productViewModel.cartProducts.add(responseData)
+                if (addedToCart)
+                    navController.navigate(Screens.Cart)
+            }, modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black, // Sets the background color of the button
                 contentColor = Color.White    // Sets the color of the text/icon inside the button
-            )) {
+            )
+        ) {
             Icon(
                 painter = if (addedToCart) painterResource(R.drawable.cart_icon) else painterResource(
                     R.drawable.add_to_cart_icon
@@ -329,11 +336,20 @@ fun ReviewItemGrid(review: Review) {
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 5.dp)
             )
-            Text(
-                text = "⭐ ${review.rating.toString()}",
-                style = NORMAL_STYLE,
-                fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "rating icon",
+                    tint = colorResource(R.color.golden),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    text = String.format("%.1f",review.rating.toDouble()),
+                    style = NORMAL_STYLE,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp))
+            }
         }
     }
 }

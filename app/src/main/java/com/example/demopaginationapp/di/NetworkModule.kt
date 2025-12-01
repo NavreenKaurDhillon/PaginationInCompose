@@ -1,7 +1,9 @@
 package com.example.demopaginationapp.di
 
+import android.util.Log
 import com.example.demopaginationapp.utils.Constants.BASE_URL
 import com.example.demopaginationapp.utils.Constants.PRODUCTS_BASE_URL
+import com.example.demopaginationapp.utils.Constants.CATEGORIES_BASE_URL
 import com.example.demopaginationapp.model.networking.ResponseHandler
 import com.example.demopaginationapp.model.networking.RetrofitInterface
 import com.example.demopaginationapp.model.repositories.AppRepository
@@ -25,11 +27,13 @@ import javax.inject.Singleton
 object NetworkModule {
 
 
-  @GoogleBaseUrl
-  @Provides
-  fun provideGoogleBaseUrl(): String {
-      return BASE_URL  //used to get repos list
-  }
+    var isHeadersRequired = false
+
+    @GoogleBaseUrl
+    @Provides
+    fun provideGoogleBaseUrl(): String {
+        return BASE_URL  //used to get repos list
+    }
 
     @ProductBaseUrl
     @Provides
@@ -37,12 +41,26 @@ object NetworkModule {
         return PRODUCTS_BASE_URL   //used to get products list
     }
 
+    @CategoriesBaseUrl
+    @Provides
+    fun provideCategoryBaseUrl(): String {
+        return CATEGORIES_BASE_URL   //used to get products list
+    }
+
     @Singleton
     @Provides
     fun provideLoggingInterceptor(): Interceptor {
         return Interceptor { chain ->
-            val request: Request = chain.request().newBuilder()
-                .build()
+            val request: Request
+            if (isHeadersRequired) {
+                Log.d("kejhejf", "provideLoggingInterceptor: isHeadersRequired truye")
+                request = chain.request().newBuilder()
+                    .addHeader("Accept", "application/json")
+                    .build()
+            } else {
+                request = chain.request().newBuilder()
+                    .build()
+            }
             chain.proceed(request)
         }
     }
@@ -86,11 +104,29 @@ object NetworkModule {
     fun provideApiService(retrofit: Retrofit): RetrofitInterface {
         return retrofit.create(RetrofitInterface::class.java)
     }
+
     @GoogleApi // Qualifies the returned RetrofitInterface instance as the Google API
     @Singleton
     @Provides
     fun provideGoogleApiService(
         @GoogleBaseUrl baseUrl: String, // Inject the qualified Google URL
+        converterFactory: Converter.Factory,
+        okHttpClient: OkHttpClient
+    ): RetrofitInterface {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(converterFactory)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+        return retrofit.create(RetrofitInterface::class.java)
+    }
+
+    @CategoriesApi // Qualifies the returned RetrofitInterface instance as CategoriesApi
+    @Singleton
+    @Provides
+    fun provideCategoryApiService(
+        @CategoriesBaseUrl baseUrl: String, // Inject the qualified Google URL
         converterFactory: Converter.Factory,
         okHttpClient: OkHttpClient
     ): RetrofitInterface {
@@ -127,7 +163,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    @GoogleApi // CRITICAL: Qualifies the returned AppRepository instance
+    @GoogleApi
     fun provideGoogleRepository(
         @GoogleApi apiService: RetrofitInterface, // Inject the qualified Google API service
         responseHandler: ResponseHandler
@@ -137,28 +173,22 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    @ProductApi // CRITICAL: Qualifies the returned AppRepository instance
+    @ProductApi
     fun provideProductRepository(
         @ProductApi apiService: RetrofitInterface, // Inject the qualified Product API service
         responseHandler: ResponseHandler
     ): AppRepository {
         return AppRepository(apiService, responseHandler)
     }
-/*
-    @Singleton
-    @Provides
-    @GoogleBaseUrl
-    fun provideRepository( apiService: RetrofitInterface, responseHandler: ResponseHandler): AppRepository {
-        return AppRepository(apiService, responseHandler)
-    }
 
     @Singleton
     @Provides
-    @ProductBaseUrl
-    fun provideProductRepository( apiService: RetrofitInterface, responseHandler: ResponseHandler): AppRepository {
+    @CategoriesApi
+    fun provideCategoryRepository(
+        @CategoriesApi apiService: RetrofitInterface, // Inject the qualified Product API service
+        responseHandler: ResponseHandler
+    ): AppRepository {
         return AppRepository(apiService, responseHandler)
     }
-*/
-
 
 }

@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -59,6 +60,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +77,7 @@ import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.networking.Resource
 import com.example.demopaginationapp.model.networking.Status
+import com.example.demopaginationapp.navigation.BottomNavItems
 import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.Constants
@@ -161,8 +164,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 }) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(10.dp)
-            ) {
+                modifier = Modifier) {
                 Text("Home", style = BOLD_STYLE, fontSize = 20.sp)
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = {
@@ -355,12 +357,20 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
                     )
                 }
                 Spacer(Modifier.height(5.dp))
-                Text(
-                    //error
-                    text = "⭐ ${String.format("%.1f", item.rating)}",
-                    style = NORMAL_STYLE,
-                    fontSize = 14.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "rating icon",
+                        tint = colorResource(R.color.golden),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        text = String.format("%.1f",item.rating.toDouble()),
+                        style = NORMAL_STYLE,
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp))
+                }
             }
             if (showFull){
                 Icon(
@@ -398,7 +408,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         // Bottom nav items
-        Constants.BottomNavItems.forEach { navItem ->
+       BottomNavItems.forEach { navItem ->
 
             NavigationBarItem(
                 // it currentRoute is equal then its selected route

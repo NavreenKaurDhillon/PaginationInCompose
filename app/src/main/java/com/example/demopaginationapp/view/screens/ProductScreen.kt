@@ -2,7 +2,6 @@ package com.example.demopaginationapp.view.screens
 
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,32 +18,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -53,13 +48,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -72,13 +68,9 @@ import com.example.demopaginationapp.R
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.networking.Resource
 import com.example.demopaginationapp.model.networking.Status
-import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.viewmodel.ProductViewModel
-import com.google.gson.Gson
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
@@ -92,35 +84,19 @@ fun ProductScreen(navController: NavHostController) {
     )
     val state = productsResource ?: Resource.loading(null)
 
-    BackHandler(enabled = true) {
-        //Handle the back press manually -> navigate to home
-        navController.navigate(Screens.Home) {
-            popUpTo(Screens.Home) {
-                inclusive = true  // remove other entries and goto home
-            }
-            launchSingleTop = true
-        }
-    }
-
+    var activeSortOption by remember { mutableStateOf("Relevance") }
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
         SortFilterDialog(
-            currentSortOption = "None", // Replace with state from ViewModel
+            activeSortOption,
             onDismiss = { showDialog = false },
             onSortSelected = { option ->
+                activeSortOption = option
                 viewModel.setSortOption(option)
-                showDialog = false
-            },
-            onFilterApplied = { brand, maxPrice ->
-
-                showDialog = false
-            },
-            onFilterClear = {
-
                 showDialog = false
             })
     }
-    Scaffold(
+   /* Scaffold(
         topBar = {
             com.example.demopaginationapp.utils.TopAppBar(
                 "Products List",
@@ -133,7 +109,7 @@ fun ProductScreen(navController: NavHostController) {
                 onFilterClick = { showDialog = true })
         },
         containerColor = Color.White,
-    ) { paddingValues ->
+    ) { paddingValues ->*/
         when (productsResource?.status) {
             Status.LOADING -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -141,13 +117,38 @@ fun ProductScreen(navController: NavHostController) {
             }
             Status.SUCCESS -> {
                 val data = state.data?.products
-                data?.let {
-                    ShowProductsList(
-                        paddingValues,
-                        it,
-                        navController
-                    )
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = {
+                            // go back to last screen
+                            navController.popBackStack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Go back",
+                                tint = Color.Black,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                        Text(
+                            text = "Products List",
+                            style = BOLD_STYLE,
+                            fontSize = 20.sp,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                    data?.let {
+                        ShowProductsList(
+                            it,
+                            navController,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    SortFilterBottomBar(
+                        onFilterClick = { showDialog = true })
                 }
+
             }
             Status.ERROR -> {
                 // Show the error message
@@ -158,7 +159,7 @@ fun ProductScreen(navController: NavHostController) {
             }
             else -> {}
         }
-    }
+//    }
 
 }
 
@@ -166,28 +167,28 @@ fun ProductScreen(navController: NavHostController) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ShowProductsList(
-    paddingValues: PaddingValues,
     data: List<Product>,
     navController: NavHostController,
-    showFavIcon: Boolean = true
+    showFavIcon: Boolean = true,
+    modifier: Modifier
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(data.size) { item ->
-            Log.d("kejfhgfwfew", "ProductScreen: ${data.size}")
-            if (showFavIcon)
-                GridItemCard(data[item], navController, 0.dp, true)
-            else
-                GridItemCard(data[item], navController, 0.dp, false)
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = modifier
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(data.size) { item ->
+                Log.d("kejfhgfwfew", "ProductScreen: ${data.size}")
+                if (showFavIcon)
+                    GridItemCard(data[item], navController, 0.dp, true)
+                else
+                    GridItemCard(data[item], navController, 0.dp, false)
+            }
         }
-    }
 }
 
 
@@ -264,11 +265,20 @@ fun GridItemCard(
                 },
                 modifier = Modifier.padding(top = 5.dp)
             )
-            Text(
-                text = "⭐ ${String.format("%.1f", item.rating)}",
-                style = NORMAL_STYLE,
-                fontSize = 14.sp
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "rating icon",
+                    tint = colorResource(R.color.golden),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    text = String.format("%.1f",item.rating),
+                    style = NORMAL_STYLE,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp))
+            }
         }
     }
 }
@@ -277,17 +287,19 @@ fun GridItemCard(
 fun SortFilterBottomBar(
     onFilterClick: () -> Unit
 ) {
-    BottomAppBar(
-        modifier = Modifier
-            .fillMaxWidth(),
-        containerColor = Color.White,
-        tonalElevation = 8.dp,
-
-    ) {
+//    BottomAppBar(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//        containerColor = Color.White,
+//        tonalElevation = 8.dp,
+//
+//    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .shadow(8.dp)
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -316,19 +328,18 @@ fun SortFilterBottomBar(
                 Text("FILTER", style = BOLD_STYLE)
             }
         }
-    }
+//    }
 }
 
 @Composable
 fun SortFilterDialog(
-    currentSortOption: String,
+    activeSortOption : String,
     onDismiss: () -> Unit,
     onSortSelected: (String) -> Unit,
-    onFilterApplied: (brand: String?, maxPrice: Double?) -> Unit,
-    onFilterClear: () -> Unit
 ) {
     // List of sorting options
-    val sortOptions = listOf("None", "Price Low to High", "Price High to Low", "Rating High to Low")
+    val sortOptions = listOf("Relevance", "Price Low to High", "Price High to Low", "Rating High to Low")
+    var selectedOption by remember { mutableStateOf(activeSortOption) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Sort Options") },
@@ -343,9 +354,20 @@ fun SortFilterDialog(
                 ) {
                     sortOptions.forEach { option ->
                         FilterChip(
-                            selected = currentSortOption == option,
-                            onClick = { onSortSelected(option) },
+                            selected = selectedOption == option,
+                            onClick = {
+                                selectedOption = option
+                                      },
                             label = { Text(option) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                // Unselected background color
+                                containerColor = colorResource(R.color.white),
+                                // Selected background color
+                                selectedContainerColor = colorResource(R.color.black),
+                                // selected text colors
+                                labelColor = colorResource(R.color.black),
+                                selectedLabelColor = colorResource(R.color.white)
+                            )
                         )
                     }
                 }
@@ -354,12 +376,14 @@ fun SortFilterDialog(
             }
         },
         confirmButton = {
-            /*  Button(onClick = {
-                  val maxPrice = maxPriceText.toDoubleOrNull()
-                  onFilterApplied(selectedBrand, maxPrice)
-              }) {
-                  Text("APPLY FILTERS")
-              }*/
+              Button(onClick = {
+                  onSortSelected(selectedOption)
+              },  colors = ButtonDefaults.buttonColors(
+                  containerColor = colorResource(R.color.green),
+                  contentColor = Color.White,
+              )) {
+                  Text("APPLY")
+              }
         },
         dismissButton = {
 

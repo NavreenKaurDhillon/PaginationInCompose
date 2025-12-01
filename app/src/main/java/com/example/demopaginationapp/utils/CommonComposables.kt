@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,12 +33,12 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.demopaginationapp.R
 import com.example.demopaginationapp.navigation.Screens
+import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar(name:String, showBackButton: Boolean, navController: NavController,  topSearchRightIcon : Boolean = false,  isHomeScreen : Boolean = false) {
   return  TopAppBar(
-      modifier = Modifier.padding(horizontal = 8.dp),
         title = { Text(name, style = BOLD_STYLE, fontSize = 20.sp) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White
@@ -122,24 +123,51 @@ fun CustomGlideImage(
 @Composable
 fun RounderRecGlideImage(
     image: String,
-    sizeDp: Dp = 0.dp
+    sizeDp: Dp = 0.dp,
+    applyElevation : Boolean = false,
+    isSquare : Boolean = false
 ){
     return   GlideImage(
         model = image,
         contentDescription = "Logo description of the repo",
         modifier = if (sizeDp == 0.dp){
-            Modifier
-                .fillMaxSize()
-                .padding( 8.dp)
-        } else {
-            Modifier
-                .height(sizeDp)
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
-                .clip(RoundedCornerShape(15.dp))
+            if (applyElevation){
+                Modifier
+                    .fillMaxSize().shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
+                    .clip(RoundedCornerShape(15.dp))
+                    .padding( 8.dp)
+            }else{
+                Modifier
+                    .fillMaxSize()
+                    .padding( 8.dp)
+
+            }
+
+        }
+       else {
+           if (isSquare){
+               Modifier
+                   .height(sizeDp)
+                   .width(sizeDp)
+                   .padding(horizontal = 8.dp)
+                   .shadow(
+                       elevation = 4.dp,
+                       shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
+                   .clip(RoundedCornerShape(15.dp))
+           }
+            else{
+               Modifier
+                   .height(sizeDp)
+                   .fillMaxWidth()
+                   .padding(horizontal = 8.dp)
+                   .shadow(
+                       elevation = 4.dp,
+                       shape = RoundedCornerShape(15.dp)).background(Color.White, shape = RoundedCornerShape(15.dp))
+                   .clip(RoundedCornerShape(15.dp))
+           }
+
         },
         contentScale = ContentScale.Fit)
 }

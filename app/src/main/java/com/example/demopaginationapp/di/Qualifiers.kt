@@ -20,3 +20,11 @@ annotation class GoogleApi
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ProductApi
+
+@Qualifier
+@Retention (AnnotationRetention.RUNTIME)
+annotation class CategoriesApi
+
+@Qualifier
+@Retention (AnnotationRetention.RUNTIME)
+annotation class CategoriesBaseUrl

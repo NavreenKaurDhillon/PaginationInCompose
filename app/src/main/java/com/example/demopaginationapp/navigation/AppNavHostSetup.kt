@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.demopaginationapp.view.screens.BrandScreen
 import com.example.demopaginationapp.view.screens.CartScreen
+import com.example.demopaginationapp.view.screens.CategoriesScreen
 import com.example.demopaginationapp.view.screens.CouponScreen
 import com.example.demopaginationapp.view.screens.DetailScreen
 import com.example.demopaginationapp.view.screens.FavScreen
@@ -29,10 +30,11 @@ fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()  //observe back stack entry and cause recomposition when needed to update ui outside the nav base dn the current route
     val currentRoute = navBackStackEntry?.destination?.route  //need current state to update scaffold padding
     NavHost(
-        modifier = if (currentRoute in bottomBarRoutes)
+        modifier = Modifier.background(color = Color.White).padding(padding)
+          /*  if (currentRoute in bottomBarRoutes)
             Modifier.background(color = Color.White).padding(padding)
         else
-            Modifier.background(color = Color.White)
+            Modifier.background(color = Color.White)*/
         ,
         navController = navController,
         startDestination = Screens.Home  //set the start destination - the first visible default fragment
@@ -60,6 +62,12 @@ fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
         }
         composable(Screens.Cart) { //used as key for navigation
             CartScreen(navController)       //navigate to class
+        }
+        composable(Screens.Categories) { //used as key for navigation
+            CategoriesScreen(navController)       //navigate to class
+        }
+        composable(Screens.CategoryItems) { //used as key for navigation
+            CategoriesScreen(navController)       //navigate to class
         }
         composable(
             route = "${Screens.RepoDetail}/{data}", // Define the argument name

@@ -4,6 +4,7 @@ import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CardDefaults
@@ -77,14 +79,29 @@ fun ListScreen(navController: NavHostController) {
     //collectAsLazyPagingItems() is used to bind the UI to the paging so it automatically sets data when we get new page response
     //also trigger the paging library to implement the logic when user has scrolled down
 
-    Scaffold(containerColor = Color.White,
-        topBar = {
-            com.example.demopaginationapp.utils.TopAppBar("Google Repos List", true, navController)}
-         ) { innerPadding ->
+//    Scaffold(containerColor = Color.White,
+//        topBar = {
+//            com.example.demopaginationapp.utils.TopAppBar("Google Repos List", true, navController)}
+//         ) { innerPadding ->
 
+
+    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = {
+                // go back to last screen
+                navController.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Go back",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            Text(text = "Google Repos List", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+        }
             LazyColumn(
-                modifier = Modifier.padding(innerPadding),
-                contentPadding = PaddingValues(12.dp),
+                contentPadding = PaddingValues(8.dp),
             ) {
                 items(lazyPagingItems) { responseDataItem ->
                     // items() is a extension function that converts paging data into set of objects that can be used to display data to UI

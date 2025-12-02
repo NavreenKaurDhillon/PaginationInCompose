@@ -57,6 +57,7 @@ fun FavScreen(navController: NavHostController) {
     val activity = context as ComponentActivity
     val viewModel: ProductViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val favoritesList = ArrayList<Product>()
+
     viewModel.products.value?.data?.products?.forEach {
         if(it.isFav) favoritesList.add(it)
     }
@@ -72,21 +73,18 @@ fun FavScreen(navController: NavHostController) {
     }
     Column(modifier = Modifier.padding(horizontal = 15.dp).fillMaxSize()) {
         Text(text = "Favorites", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.padding( 10.dp).fillMaxWidth(), textAlign = TextAlign.Center)
-        if (favoritesList.size>0) {
+        if (favoritesList.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(12.dp),
             ) {
-                items(favoritesList?.size ?: 0) { item ->
-                    favoritesList?.let {
-                        FavItemCard(
-                            it[item],
-                            navController,
-                            0.dp,
-                            true,
-                        )
-                    }
+                items(favoritesList.size) { item ->
+                    FavItemCard(
+                        favoritesList[item],
+                        navController,
+                        0.dp,
+                    )
                 }
             }
         }
@@ -101,7 +99,7 @@ fun FavScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FavItemCard(item: Product, navController: NavHostController, width: Dp, showFull : Boolean = false) {
+fun FavItemCard(item: Product, navController: NavHostController, width: Dp) {
     var isFavorite by remember { mutableStateOf(item.isFav) }
     ElevatedCard(
         modifier = if(width>0.dp){
@@ -116,7 +114,7 @@ fun FavItemCard(item: Product, navController: NavHostController, width: Dp, show
         colors = CardDefaults.elevatedCardColors(
             containerColor = Color.White
         ), onClick = {
-            navController.navigate("product_detail_screen/${item.id.toString()}")
+            navController.navigate("product_detail_screen/${item.id}")
         },
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 5.dp)
@@ -130,7 +128,7 @@ fun FavItemCard(item: Product, navController: NavHostController, width: Dp, show
                     .height(110.dp),)
             Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = item.title ?: "",
+                        text = item.title,
                         style = BOLD_STYLE,
                         color = Color.Black,
                         maxLines = 1,

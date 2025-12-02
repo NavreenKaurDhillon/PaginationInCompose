@@ -1,13 +1,11 @@
 package com.example.demopaginationapp.model.repositories
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.demopaginationapp.di.GoogleBaseUrl
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
 import javax.inject.Inject
 import kotlin.math.max
-
 
 
 private const val STARTING_KEY = 1
@@ -25,8 +23,6 @@ class MyPagingSource @Inject constructor(@GoogleBaseUrl private val appRepositor
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ResponseDataItem> {
         val startKey = params.key ?: STARTING_KEY
-
-        Log.d("kfhkjefhje", "load: ${params.key}   ${params.loadSize} ")
         return try {
           //call api to fetch here
             val response = appRepository.getList(

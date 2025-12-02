@@ -60,15 +60,15 @@ fun BrandScreen(navController: NavHostController) {
                 items(it.size) { item ->
                     Column(modifier = Modifier.clickable{
                         navController.navigate(Screens.ProductsList)
-                    }, horizontalAlignment = Alignment.CenterHorizontally) {
+                    }.padding(bottom = 15.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         CustomGlideImage(
-                            it[item].images[0].toString(),
+                            it[item].images[0],
                             0.dp,
                             8.dp,
                             4.dp,
                             CircleShape)
                         Text(
-                            text = it[item].brand ?: "Dummy", style = BOLD_STYLE,
+                            text = it[item].brand?: "Dummy", style = BOLD_STYLE,
                             modifier = Modifier
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                                 .fillMaxWidth(),

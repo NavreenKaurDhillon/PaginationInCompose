@@ -4,7 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -48,14 +46,12 @@ fun SearchScreen(navController: NavHostController) {
         } else {
             mutableStateOf(
                 viewModel.products.value?.data?.products?.filter { product ->
-                    product.title.contains(searchText, ignoreCase = true) ||
-                            product.brand?.contains(searchText, ignoreCase = true) == true
+                    product.title.contains(searchText, ignoreCase = true) || product.brand?.contains(searchText, ignoreCase = true) == true
                 }
             )
         }
     }
 
-//    Scaffold(containerColor = Color.White) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize()) {
             TextField(
                 value = searchText,
@@ -110,5 +106,4 @@ fun SearchScreen(navController: NavHostController) {
                 filteredProducts?.let { ShowProductsList(it, navController, false, Modifier.weight(1f)) }
             }
         }
-//    }
 }

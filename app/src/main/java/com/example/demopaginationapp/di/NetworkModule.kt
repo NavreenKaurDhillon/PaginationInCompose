@@ -1,12 +1,11 @@
 package com.example.demopaginationapp.di
 
-import android.util.Log
-import com.example.demopaginationapp.utils.Constants.BASE_URL
-import com.example.demopaginationapp.utils.Constants.PRODUCTS_BASE_URL
-import com.example.demopaginationapp.utils.Constants.CATEGORIES_BASE_URL
 import com.example.demopaginationapp.model.networking.ResponseHandler
 import com.example.demopaginationapp.model.networking.RetrofitInterface
 import com.example.demopaginationapp.model.repositories.AppRepository
+import com.example.demopaginationapp.utils.Constants.BASE_URL
+import com.example.demopaginationapp.utils.Constants.CATEGORIES_BASE_URL
+import com.example.demopaginationapp.utils.Constants.PRODUCTS_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,7 +52,6 @@ object NetworkModule {
         return Interceptor { chain ->
             val request: Request
             if (isHeadersRequired) {
-                Log.d("kejhejf", "provideLoggingInterceptor: isHeadersRequired truye")
                 request = chain.request().newBuilder()
                     .addHeader("Accept", "application/json")
                     .build()

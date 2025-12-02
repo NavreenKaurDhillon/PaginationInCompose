@@ -6,9 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
@@ -26,17 +23,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -45,15 +38,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.model.dataclasses.ResponseDataItem
 import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
+import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.RounderRecGlideImage
-import com.example.demopaginationapp.utils.TopAppBar
 import com.google.gson.Gson
+import androidx.core.net.toUri
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -66,34 +58,12 @@ fun DetailScreen(data: String?, navController: NavController) {
                 Gson().fromJson(data, ResponseDataItem::class.java)
             } catch (e: Exception){
                 Toast.makeText((context), "Exception caused is ${e.message}", Toast.LENGTH_LONG).show()
-                Log.d("hhhh", "DetailScreen: exeption caused is ${e.message} ")
             }
         } else
             null) as ResponseDataItem
     }
 
-/*    Scaffold(containerColor = Color.White,
-        topBar = {
-            TopAppBar("Details", true, navController)
-        }) { paddingValues ->*/
-        ShowRepoDetail(responseData, context, navController)
-//    }
-
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun ShowRepoDetail(
-    responseData: ResponseDataItem,
-    context: Context,
-    navController: NavController
-) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 12.dp).verticalScroll(rememberScrollState()),
-    ) {
-        val url = responseData.owner.organizations_url
-
+    Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = {
                 // go back to last screen
@@ -106,8 +76,34 @@ fun ShowRepoDetail(
                     modifier = Modifier.size(30.dp)
                 )
             }
-            Text(text = "Details", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+            Text(
+                text = "Details",
+                style = BOLD_STYLE,
+                fontSize = 20.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
         }
+        ShowRepoDetail(responseData, context, navController)
+    }
+
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ShowRepoDetail(
+    responseData: ResponseDataItem,
+    context: Context,
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 12.dp).verticalScroll(rememberScrollState()),
+    ) {
+        val url = responseData.owner.organizations_url
+
+
         Spacer(Modifier.height(5.dp))
         RounderRecGlideImage(responseData.owner.avatar_url, 200.dp)
         Spacer(Modifier.height(15.dp))
@@ -162,7 +158,7 @@ fun ShowRepoDetail(
                         start = offset,
                         end = offset
                     ).firstOrNull()?.let { annotation ->
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                        val intent = Intent(Intent.ACTION_VIEW, annotation.item.toUri())
                         context.startActivity(intent)
                     }
                 },
@@ -214,7 +210,7 @@ fun ShowRepoDetail(
                         append("Default branch:")
                     }
                     withStyle(NORMAL_STYLE.toSpanStyle()) {
-                        append(responseData.default_branch.toString())
+                        append(responseData.default_branch)
                     }
                 }, modifier = Modifier.padding(top = 5.dp)
             )

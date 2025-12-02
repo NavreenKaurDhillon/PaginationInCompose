@@ -1,18 +1,5 @@
 package com.example.demopaginationapp.utils
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.demopaginationapp.R
-import com.example.demopaginationapp.model.dataclasses.BottomNavItem
-import com.example.demopaginationapp.navigation.Screens
-
 object Constants {
     const val LISTING = "users/google/repos"
     const val PRODUCTS_LIST = "products"

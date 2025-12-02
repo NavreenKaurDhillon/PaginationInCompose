@@ -37,8 +37,6 @@ class AppRepository @Inject constructor(
 
     suspend fun getCategories(parentId: Int): Resource<CategoriesResponseData> {
         return try {
-//            val hashMap = HashMap<String, String>()
-//            hashMap["parentId"] = parentId.toString()
             responseHandler.handleResponse(
                 apiService.getCategories(
                    parentId.toString()

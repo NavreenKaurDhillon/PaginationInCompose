@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import com.example.demopaginationapp.model.dataclasses.BottomNavItem
@@ -20,11 +19,11 @@ val BottomNavItems = listOf(
     BottomNavItem(
         tabName = "Categories",
         tabIcon =Icons.Filled.Person,
-        destination = Screens.CategoryItems
+        destination = Screens.Categories
     ),
     // Products list
     BottomNavItem(
-        tabName = "Products",
+        tabName = "Brands",
         tabIcon = Icons.Filled.List,
         destination = Screens.Brands
     ),

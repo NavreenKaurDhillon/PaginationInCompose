@@ -1,21 +1,14 @@
 package com.example.demopaginationapp.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.demopaginationapp.di.GoogleApi
-import com.example.demopaginationapp.di.GoogleBaseUrl
-import com.example.demopaginationapp.model.networking.Resource
 import com.example.demopaginationapp.model.repositories.AppRepository
 import com.example.demopaginationapp.model.repositories.MyPagingSource
-import com.google.gson.JsonElement
-import com.google.gson.JsonNull
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 

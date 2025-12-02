@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Chip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -82,7 +82,7 @@ fun ProductScreen(navController: NavHostController) {
     val productsResource by viewModel.products.observeAsState(
         initial = Resource.loading(null)  //set loading state as initial -> display loader
     )
-    val state = productsResource ?: Resource.loading(null)
+    val state = productsResource
 
     var activeSortOption by remember { mutableStateOf("Relevance") }
     var showDialog by remember { mutableStateOf(false) }
@@ -96,21 +96,8 @@ fun ProductScreen(navController: NavHostController) {
                 showDialog = false
             })
     }
-   /* Scaffold(
-        topBar = {
-            com.example.demopaginationapp.utils.TopAppBar(
-                "Products List",
-                showBackButton = true,
-                navController = navController
-            )
-        },
-        bottomBar = {
-            SortFilterBottomBar(
-                onFilterClick = { showDialog = true })
-        },
-        containerColor = Color.White,
-    ) { paddingValues ->*/
-        when (productsResource?.status) {
+
+        when (productsResource.status) {
             Status.LOADING -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator() }
@@ -159,7 +146,6 @@ fun ProductScreen(navController: NavHostController) {
             }
             else -> {}
         }
-//    }
 
 }
 
@@ -248,7 +234,7 @@ fun GridItemCard(
                 modifier = Modifier.padding(top = 5.dp)
             )
             Text(
-                text = item.availabilityStatus ?: "",
+                text = item.availabilityStatus,
                 style = NORMAL_STYLE,
                 color = Color.Gray,
                 maxLines = 3,
@@ -360,15 +346,12 @@ fun SortFilterDialog(
                                       },
                             label = { Text(option) },
                             colors = FilterChipDefaults.filterChipColors(
-                                // Unselected background color
-                                containerColor = colorResource(R.color.white),
-                                // Selected background color
-                                selectedContainerColor = colorResource(R.color.black),
-                                // selected text colors
-                                labelColor = colorResource(R.color.black),
-                                selectedLabelColor = colorResource(R.color.white)
-                            )
-                        )
+                                containerColor = colorResource(R.color.white),   // Unselected background color
+                                selectedContainerColor = colorResource(R.color.black),  // Selected background color
+                                labelColor = colorResource(R.color.black),   // Unselected text color
+                                selectedLabelColor = colorResource(R.color.white)   //Selected text color
+                            ))
+
                     }
                 }
                 // Separator

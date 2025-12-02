@@ -1,8 +1,6 @@
 package com.example.demopaginationapp.view.activities
 
 import android.os.Bundle
-import android.provider.Settings.Secure
-import android.telephony.TelephonyManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge

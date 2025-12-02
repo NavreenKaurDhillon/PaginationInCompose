@@ -42,7 +42,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,7 +79,6 @@ import com.example.demopaginationapp.model.networking.Status
 import com.example.demopaginationapp.navigation.BottomNavItems
 import com.example.demopaginationapp.navigation.Screens
 import com.example.demopaginationapp.utils.BOLD_STYLE
-import com.example.demopaginationapp.utils.Constants
 import com.example.demopaginationapp.utils.CustomGlideImage
 import com.example.demopaginationapp.utils.NORMAL_STYLE
 import com.example.demopaginationapp.utils.RounderRecGlideImage
@@ -99,7 +97,7 @@ fun HomeScreen(navController: NavHostController) {
     val productsResource by viewModel.products.observeAsState(
         initial = Resource.loading(null)  //set loading state as initial -> display loader
     )
-    val state = productsResource ?: Resource.loading(null)
+    val state = productsResource
 
 
     BackHandler(enabled = true) {
@@ -154,7 +152,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 16.dp)
+                .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
                 .verticalScroll(scrollState)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -172,7 +170,8 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Search, // Standard back arrow icon
-                        contentDescription = "Go back",
+                        contentDescription = "Search",
+                        tint = Color.Black,
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -181,7 +180,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 }) {
                     Image(
                         painter = painterResource(R.drawable.outline_event_list_24), // Standard back arrow icon
-                        contentDescription = "Go back",
+                        contentDescription = "Repos",
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -264,7 +263,7 @@ fun DisplayHome(data: List<Product>?, navController: NavHostController) {
                 items(data?.size ?: 0) { item ->
                     Log.d("kejfhgfwfew", "ProductScreen: ${data?.size ?: 0}")
                     data?.get(item)?.let {
-                        CustomGlideImage(it?.images[0].toString(), 0.dp, 3.dp, 4.dp, CircleShape)
+                        CustomGlideImage(it.images[0], 0.dp, 3.dp, 4.dp, CircleShape)
                     }
                 }
             }
@@ -302,10 +301,10 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
         colors = CardDefaults.elevatedCardColors(
             containerColor = Color.White
         ), onClick = {
-            navController.navigate("product_detail_screen/${item.id.toString()}")
+            navController.navigate("product_detail_screen/${item.id}")
         },
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 5.dp
+            defaultElevation = 4.dp
         )
     ) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -319,7 +318,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
             Column(modifier = Modifier.weight(1f)) {
                 if (showFull){
                     Text(
-                        text = item.title ?: "",
+                        text = item.title,
                         style = BOLD_STYLE,
                         color = Color.Black,
                         maxLines = 1,
@@ -327,7 +326,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
                         modifier = Modifier.padding(top = 5.dp)
                     )
                     Text(
-                        text = item.brand ?: "Dummy",
+                        text = item.brand?: "Dummy",
                         style = NORMAL_STYLE,
                         color = Color.Gray,
                         maxLines = 1,
@@ -348,7 +347,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
                 }
                 else{
                     Text(
-                        text = item.brand ?: "",
+                        text = item.brand?: "Dummy",
                         style = BOLD_STYLE,
                         color = Color.Black,
                         maxLines = 1,
@@ -366,7 +365,7 @@ fun GridHorizontalItemCard(item: Product, navController: NavHostController, widt
                     )
                     Spacer(Modifier.width(3.dp))
                     Text(
-                        text = String.format("%.1f",item.rating.toDouble()),
+                        text = String.format("%.1f", item.rating),
                         style = NORMAL_STYLE,
                         textAlign = TextAlign.Center,
                         fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp))

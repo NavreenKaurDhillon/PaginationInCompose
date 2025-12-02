@@ -1,16 +1,11 @@
 package com.example.demopaginationapp.view.screens
 
-import android.graphics.pdf.models.ListItem
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,37 +14,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
@@ -69,7 +51,6 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 
-
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
@@ -85,7 +66,7 @@ fun ListScreen(navController: NavHostController) {
 //         ) { innerPadding ->
 
 
-    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+    Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = {
                 // go back to last screen
@@ -101,7 +82,7 @@ fun ListScreen(navController: NavHostController) {
             Text(text = "Google Repos List", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
         }
             LazyColumn(
-                contentPadding = PaddingValues(8.dp),
+                contentPadding = PaddingValues(horizontal = 15.dp),
             ) {
                 items(lazyPagingItems) { responseDataItem ->
                     // items() is a extension function that converts paging data into set of objects that can be used to display data to UI
@@ -110,7 +91,6 @@ fun ListScreen(navController: NavHostController) {
                         ListItemCard(
                             responseDataItem = responseDataItem,
                             navController = navController,
-                            onItemClick = { route -> navController.navigate(route) },
                         )
 
                     } else {
@@ -172,8 +152,7 @@ fun ListScreen(navController: NavHostController) {
 @Composable
 private fun ListItemCard(
     responseDataItem: ResponseDataItem,
-    navController: NavController,
-    onItemClick: (String) -> Unit
+    navController: NavController
 ) {
 
 

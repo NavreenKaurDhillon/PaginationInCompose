@@ -1,11 +1,7 @@
 package com.example.demopaginationapp.view.screens
 
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,16 +21,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -88,14 +83,24 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
             responseData = p
 
 
-
-    Scaffold(
-        containerColor = Color.White,
-        topBar = {
-            TopAppBar("Details", true, navController)
-        }) { paddingValues ->
-        responseData?.let { ShowDetails(it, paddingValues, navController, productViewModel) }
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = {
+                // go back to last screen
+                navController.popBackStack()
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Go back",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+            Text(text = "Details", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+        }
+        responseData?.let { ShowDetails(it,  navController, productViewModel) }
     }
+
 
 }
 
@@ -103,7 +108,6 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
 @Composable
 fun ShowDetails(
     responseData: Product,
-    paddingValues: PaddingValues,
     navController: NavController,
     productViewModel: ProductViewModel
 ) {
@@ -123,9 +127,8 @@ fun ShowDetails(
 
     Column(
         modifier = Modifier
+            .padding(horizontal = 15.dp)
             .fillMaxSize()
-            .padding(paddingValues)
-            .padding(horizontal = 20.dp)
             .verticalScroll(scrollState)
     ) {
         Spacer(Modifier.height(5.dp))
@@ -191,7 +194,7 @@ fun ShowDetails(
                     append("Brand :")
                 }
                 withStyle(NORMAL_STYLE.toSpanStyle()) {
-                    append(responseData.brand)
+                    append(responseData.brand?:"Dummy")
                 }
             }
         )
@@ -252,8 +255,8 @@ fun ShowDetails(
             }
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(responseData?.reviews?.size ?: 0) { topItem ->
-                responseData?.reviews?.get(topItem)?.let { ReviewItemGrid(it) }
+            items(responseData.reviews.size) { topItem ->
+                ReviewItemGrid(responseData.reviews[topItem])
             }
         }
         Spacer(Modifier.height(20.dp))
@@ -316,7 +319,7 @@ fun ReviewItemGrid(review: Review) {
             containerColor = Color.White
         ),
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 5.dp
+            defaultElevation = 4.dp
         )
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -329,7 +332,7 @@ fun ReviewItemGrid(review: Review) {
                 modifier = Modifier.padding(top = 5.dp)
             )
             Text(
-                text = review.comment ?: "",
+                text = review.comment,
                 style = NORMAL_STYLE,
                 color = Color.Gray,
                 maxLines = 3,

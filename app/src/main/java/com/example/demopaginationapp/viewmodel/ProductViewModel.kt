@@ -1,24 +1,19 @@
 package com.example.demopaginationapp.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.demopaginationapp.di.ProductApi
 import com.example.demopaginationapp.model.dataclasses.Product
 import com.example.demopaginationapp.model.dataclasses.ProductResponseData
 import com.example.demopaginationapp.model.networking.Resource
-import com.example.demopaginationapp.model.networking.Status
 import com.example.demopaginationapp.model.repositories.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.map
-import kotlin.math.min
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(@ProductApi private val appRepository: AppRepository) : ViewModel() {
@@ -57,7 +52,7 @@ class ProductViewModel @Inject constructor(@ProductApi private val appRepository
                 sortedProducts?.let {
                     ProductResponseData(
                         products = it,
-                        limit = baseProducts.value?.data?.limit?.toInt(),
+                        limit = baseProducts.value?.data?.limit,
                         skip = baseProducts.value?.data?.skip,
                         total = baseProducts.value?.data?.total
                     )

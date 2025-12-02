@@ -64,10 +64,7 @@ fun AppNavHostSetup(navController: NavHostController, padding: PaddingValues) {
             CartScreen(navController)       //navigate to class
         }
         composable(Screens.Categories) { //used as key for navigation
-            CategoriesScreen(navController)       //navigate to class
-        }
-        composable(Screens.CategoryItems) { //used as key for navigation
-            CategoriesScreen(navController)       //navigate to class
+            CategoriesScreen()       //navigate to class
         }
         composable(
             route = "${Screens.RepoDetail}/{data}", // Define the argument name

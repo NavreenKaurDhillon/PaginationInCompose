@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -96,9 +98,15 @@ fun ProductDetailScreen(data: String?, navController: NavController) {
                     modifier = Modifier.size(30.dp)
                 )
             }
-            Text(text = "Details", style = BOLD_STYLE, fontSize = 20.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+            Text(
+                text = "Details",
+                style = BOLD_STYLE,
+                fontSize = 20.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
         }
-        responseData?.let { ShowDetails(it,  navController, productViewModel) }
+        responseData?.let { ShowDetails(it, navController, productViewModel) }
     }
 
 
@@ -115,7 +123,8 @@ fun ShowDetails(
     val scrollState = rememberScrollState()
     val addedToCart = productViewModel.cartProducts.contains(responseData)
     val pagerState = rememberPagerState(initialPage = 0) { pageCount }
-    var descriptionExpanded by rememberSaveable { mutableStateOf(false) }
+    var descriptionExpanded by remember { mutableStateOf(false) }
+    var textOverflows by remember { mutableStateOf(false) }
     LaunchedEffect(pagerState) {
         // Coroutine loop for auto-scrolling
         while (true) {
@@ -183,7 +192,7 @@ fun ShowDetails(
                     append("Price :")
                 }
                 withStyle(NORMAL_STYLE.toSpanStyle()) {
-                    append(responseData.price.toString())
+                    append("$" + responseData.price.toString())
                 }
             }
         )
@@ -194,7 +203,7 @@ fun ShowDetails(
                     append("Brand :")
                 }
                 withStyle(NORMAL_STYLE.toSpanStyle()) {
-                    append(responseData.brand?:"Dummy")
+                    append(responseData.brand ?: "Dummy")
                 }
             }
         )
@@ -219,39 +228,48 @@ fun ShowDetails(
                     append(responseData.description)
                 }
             },
+            onTextLayout = { textLayoutResult ->
+                // This state is updated only when the text is in its collapsed state
+                if (!descriptionExpanded) {
+                    textOverflows = textLayoutResult.hasVisualOverflow
+                }
+            },
             maxLines = if (descriptionExpanded) Int.MAX_VALUE else 3,  //max 3 lines for description
             overflow = TextOverflow.Ellipsis //show ... if text is more than 3 lines
         )
 
-        TextButton(
-            onClick = {
-                descriptionExpanded = !descriptionExpanded
-            }, colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-            )
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+        if (textOverflows) {
+
+            TextButton(
+                onClick = {
+                    descriptionExpanded = !descriptionExpanded
+                }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                )
             ) {
-                Icon(
-                    painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
-                        R.drawable.baseline_keyboard_arrow_down_24
-                    ),
-                    tint = Color.Blue,
-                    contentDescription = "expand text",
-                    modifier = Modifier
-                        .size(25.dp)
-                        .padding(end = 5.dp)
-                )
-                Text(
-                    text = if (descriptionExpanded) "Show Less" else "Show More",
-                    fontSize = 14.sp,
-                    style = NORMAL_STYLE,
-                    color = Color.Blue,
-                    textDecoration = TextDecoration.Underline
-                )
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = if (descriptionExpanded) painterResource(R.drawable.baseline_keyboard_arrow_up_24) else painterResource(
+                            R.drawable.baseline_keyboard_arrow_down_24
+                        ),
+                        tint = Color.Blue,
+                        contentDescription = "expand text",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .padding(end = 5.dp)
+                    )
+                    Text(
+                        text = if (descriptionExpanded) "Show Less" else "Show More",
+                        fontSize = 14.sp,
+                        style = NORMAL_STYLE,
+                        color = Color.Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
+                }
             }
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -329,15 +347,17 @@ fun ReviewItemGrid(review: Review) {
                 style = BOLD_STYLE,
                 color = Color.Black,
                 maxLines = 1,
-                modifier = Modifier.padding(top = 5.dp)
+                modifier = Modifier.padding(top = 5.dp),
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = review.comment,
                 style = NORMAL_STYLE,
                 color = Color.Gray,
-                maxLines = 3,
+                maxLines = 1,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(top = 5.dp)
+                modifier = Modifier.padding(top = 5.dp),
+                overflow = TextOverflow.Ellipsis
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -348,10 +368,11 @@ fun ReviewItemGrid(review: Review) {
                 )
                 Spacer(Modifier.width(3.dp))
                 Text(
-                    text = String.format("%.1f",review.rating.toDouble()),
+                    text = String.format("%.1f", review.rating.toDouble()),
                     style = NORMAL_STYLE,
                     textAlign = TextAlign.Center,
-                    fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp))
+                    fontSize = 14.sp, modifier = Modifier.padding(top = 5.dp)
+                )
             }
         }
     }

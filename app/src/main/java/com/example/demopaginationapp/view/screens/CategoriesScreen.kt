@@ -125,7 +125,7 @@ fun ShowCategories(
                             Text(text = "No products found!", style = NORMAL_STYLE, textAlign = TextAlign.Center)
                         }
                     } else {
-                        LazyColumn(modifier = Modifier.weight(0.76f).padding(horizontal = 10.dp), verticalArrangement = Arrangement.spacedBy(20.dp),
+                        LazyColumn(modifier = Modifier.weight(0.76f).padding(start = 10.dp, end = 10.dp, bottom = 15.dp ), verticalArrangement = Arrangement.spacedBy(15.dp),
                         ) {
                             items(subCategoriesState.data.data.categories.size) { pos ->
                                 val item = subCategoriesState.data.data.categories
@@ -144,12 +144,12 @@ fun ShowCategories(
                                     }
                                     FlowRow(maxItemsInEachRow = 3) {
                                         item[pos].children.forEach {
-                                            Column(modifier = Modifier.fillMaxWidth(0.3f).padding(top = 10.dp, bottom = 15.dp),
+                                            Column(modifier = Modifier.fillMaxWidth(0.3f).padding(vertical = 10.dp),
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 RounderRecGlideImage(it.icon, 70.dp, true, isSquare = false)
                                                 Spacer(Modifier.height(8.dp))
-                                                Text(text = it.prodcat_name, style = SMALL_BOLD_STYLE)
+                                                Text(text = it.prodcat_name, style = SMALL_BOLD_STYLE, textAlign = TextAlign.Center)
                                             }
                                         }
                                     }
